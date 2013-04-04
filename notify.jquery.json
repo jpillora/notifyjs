@@ -1,0 +1,28 @@
+{
+  "name": "notify",
+  "version": "0.0.1",
+  "title": "notify",
+  "description": "A robust, customizable notification library",
+  "bugs": "https://github.com/jpillora/notifyjs/issues",
+  "homepage": "http://notifyjs.com",
+  "docs": "http://notifyjs.com",
+  "download": "http://notifyjs.com#download",
+  "author": {
+    "name": "Jaime Pillora"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "keywords": [
+    "notify",
+    "notification",
+    "prompt",
+    "popup"
+  ],
+  "dependencies": {
+    "jquery": ">=1.8"
+  }
+}
