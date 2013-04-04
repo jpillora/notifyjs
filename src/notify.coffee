@@ -3,7 +3,7 @@
 
 #plugin constants
 pluginName = 'notify'
-className = '__notify'
+className = '__'+pluginName
 
 arrowDirs =
   top: 'bottom'
@@ -20,12 +20,30 @@ styles =
       </div>
     """
     css: """
+      .#{className}Corner {
+        position: fixed;
+        top: 0;
+        right: 0;
+        margin: 5px;
+        z-index: 1050;
+      }
+
+      .#{className}Corner .#{className}Wrapper,
+      .#{className}Corner .#{className}Container {
+        position: relative;
+        display: block;
+        height: inherit;
+        width: inherit;
+
+      }
+
       .#{className}Wrapper {
         z-index: 1;
         position: absolute;
         display: inline-block;
         height: 0;
         width: 0;
+        opacity: 0.85;
       }
 
       .#{className}Container {
@@ -42,7 +60,11 @@ styles =
   user:
     default:
       html: """
-        <div class="#{className}Default" data-notify-style="color: {{COLOR}}; border-color: {{COLOR}};">
+        <div class="#{className}Default" 
+             data-notify-style="
+              color: {{color}}; 
+              border-color: {{color}};
+             ">
            <span data-notify="text"></span>
          </div>
       """
@@ -65,18 +87,22 @@ styles =
 
     bootstrap: 
       html: """
-        <span>test</span>
+        <div class="alert alert-error #{className}Bootstrap">
+          <strong>Warning!</strong> <span data-notify="text"></span>
+        </div>
       """
       css: """
-        body {
-          test: 42
+        .#{className}Bootstrap {
+          white-space: nowrap;
         }
       """
+      colors:
+        red: '#eed3d7'
 
 #overridable options
 pluginOptions =
-  autoHidePrompt: false
-  autoHideDelay: 10000
+  autoHide: false
+  autoHideDelay: 2000
   arrowShow: true
   arrowSize: 5
   arrowPosition: 'top'
@@ -86,13 +112,13 @@ pluginOptions =
   color: 'red'
   # Color mappings
   colors:
-    red: '#ee0101'
+    red: '#b94a48'
     green: '#33be40'
     black: '#393939'
     blue: '#00f'
-  showAnimation: 'fadeIn'
+  showAnimation: 'slideDown'
   showDuration: 200
-  hideAnimation: 'fadeOut'
+  hideAnimation: 'slideUp'
   hideDuration: 600
   # Gap between main and element
   gap: 2
@@ -107,7 +133,10 @@ create = (tag) ->
 Options = (options) -> $.extend @, options
 Options:: = pluginOptions
 
-  #gets first on n radios, and gets the fancy stylised input for hidden inputs
+# container for element-less notifications
+cornerElem = create("div").addClass("#{className}Corner")
+
+#gets first on n radios, and gets the fancy stylised input for hidden inputs
 getAnchorElement = (element) ->
   #choose the first of n radios
   if element.is('[type=radio]')
@@ -120,33 +149,38 @@ getAnchorElement = (element) ->
   element
 
 #define plugin
-class Prompt
+class Notification
   
   #setup instance variables
-  constructor: (elem, node, options) ->
+  constructor: (elem, data, options) ->
     options = {color: options} if $.type(options) is 'string'
     @options = new Options if $.isPlainObject(options) then options else {}
 
-    @elementType = elem.attr('type')
-    @originalElement = elem
-    @elem = getAnchorElement(elem)
-    @elem.data pluginName, @
-
     #load user css into dom
     @loadCSS()
-    #load user html into @container
+    #load user html into @userContainer
     @loadHTML()
 
     @wrapper = $(styles.core.html)
+    @wrapper.data pluginName, @
     @container = @wrapper.find ".#{className}Container"
-
     @container.append @userContainer
 
-    # add into dom
-    @elem.before @wrapper
-    @container.css @calculateCSS()
+    if elem and elem.length
+      @elementType = elem.attr('type')
+      @originalElement = elem
+      @elem = getAnchorElement(elem)
+      @elem.data pluginName, @
+      # add into dom above elem
+      @elem.before @wrapper
+      @container.css @calculateCSS()
+    else
+      # @options.autoHide = true
+      @options.arrowShow = false
+      cornerElem.prepend @wrapper
 
-    @run(node)
+    @container.hide()
+    @run(data)
 
   loadCSS: (style) ->
     name = @options.style
@@ -188,7 +222,7 @@ class Prompt
     showArrow = @options.arrowShow and @elementType isnt 'radio'
     if showArrow then @arrow.show() else @arrow.hide()
 
-  showMain: (show) ->
+  show: (show) ->
     hidden = @container.parent().parents(':hidden').length > 0
     @container.show()  if hidden and show
     @container.hide()  if hidden and not show
@@ -207,7 +241,11 @@ class Prompt
     }
 
   getColor: ->
-    @options.colors[@options.color] or @options.color
+    styleColors = @getStyle().colors
+    return (styleColors and
+            styleColors[@options.color]) or
+           @options.colors[@options.color] or 
+           @options.color
 
   getStyle: (name) ->
     name = @options.style unless name
@@ -216,7 +254,7 @@ class Prompt
     style
 
   #run plugin
-  run: (node, options) ->
+  run: (data, options) ->
     #update options
     if $.isPlainObject(options)
       $.extend @options, options 
@@ -224,52 +262,64 @@ class Prompt
     else if $.type(options) is 'string'
       @options.color = options
 
-    if @container and not node
-      @showMain false #hide
+    if @container and not data
+      @show false #hide
       return
-    else if not @container and not node
+    else if not @container and not data
       return
 
     #update content
-    if $.type(node) is 'string'
-      @text.html node.replace('\n', '<br/>')
+    if $.type(data) is 'string'
+      @text.html data.replace('\n', '<br/>')
     else
-      @text.empty().append(node)
-
+      @text.empty().append(data)
 
     color = @getColor()
     @container.find('[data-notify-style]').each ->
       s = $(@).attr 'data-notify-style'
-      $(@).attr 'style', s.replace /\{\{\s*COLOR\s*\}\}/ig, color
+      $(@).attr 'style', s.replace /\{\{\s*color\s*\}\}/ig, color
 
     @arrow.remove() if @arrow
     @buildArrow()
     @container.prepend @arrow
 
-    @showMain true
+    @show true
 
     #autohide
-    if @options.autoHidePrompt
-      clearTimeout @elem.data 'mainTimer'
-      t = setTimeout ->
-        @showMain false
+    if @options.autoHide
+      clearTimeout @autohideTimer
+      autohideTimer = setTimeout =>
+        @show false
       , @options.autoHideDelay
-      @elem.data 'mainTimer', t
 
 #when ready, bind permanent hide listener
 $ ->
+  $("body").append cornerElem
+
+  #auto-detect bootstrap
+  $("link").each ->
+    src =  $(@).attr 'href'
+    if src.match /bootstrap[^\/]*\.css/
+      $[pluginName].options {style:'bootstrap'}
+      return false
   #add core styles
   $("head").append(create("style").html(styles.core.css))
-
-  $(document).on 'click', ".#{className}", ->
-    inst = getAnchorElement($(@)).data pluginName
-    inst.showMain false if inst?
+  #watch all notifications clicks
+  $(document).on 'click', ".#{className}Wrapper", ->
+    inst = $(@).data pluginName
+    inst.show false if inst
 
 # publicise jquery plugin
 # return alert "$.#{pluginName} already defined" if $[pluginName]?
 # $.pluginName( { ...  } ) changes options for all instances
-$[pluginName] = (elem, node, options) ->
-  $(elem)[pluginName](node, options)
+$[pluginName] = (elem, data, options) ->
+  if elem instanceof HTMLElement or
+     elem.jquery
+    $(elem)[pluginName](data, options)
+  else
+    options = data
+    data = elem
+    new Notification null, data, options 
 
 # publicise options method
 $[pluginName].options = (options) ->
@@ -281,13 +331,11 @@ $[pluginName].addStyle = (s) ->
 # $( ... ).pluginName( { .. } ) creates a cached instance on each
 # selected item with custom options for just that instance
 # return alert "$.fn#{pluginName} already defined" if $.fn[pluginName]?
-$.fn[pluginName] = (node, options) ->
+$.fn[pluginName] = (data, options) ->
   $(@).each ->
     inst = getAnchorElement($(@)).data pluginName
-    if inst?
-      inst.run node, options
+    if inst
+      inst.run data, options
     else
-      new Prompt $(@), node, options
-
-#ps. alex is gay.
+      new Notification $(@), data, options
 
