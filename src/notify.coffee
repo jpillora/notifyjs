@@ -14,7 +14,10 @@ arrowDirs =
 styles =
   core:
     html: """
-      <div class="#{className}Wrapper"></div>
+      <div class="#{className}Wrapper">
+        <div class="#{className}Container">
+        </div>
+      </div>
     """
     css: """
       .#{className}Wrapper {
@@ -39,9 +42,9 @@ styles =
   user:
     default:
       html: """
-        <div>
-          <div class="#{className}Default" data-notify="text"></div>
-        </div>
+        <div class="#{className}Default" data-notify-style="color: {{COLOR}}; border-color: {{COLOR}};">
+           <span data-notify="text"></span>
+         </div>
       """
       css: """
         .#{className}Default {
@@ -135,7 +138,9 @@ class Prompt
     @loadHTML()
 
     @wrapper = $(styles.core.html)
-    @wrapper.append @container
+    @container = @wrapper.find ".#{className}Container"
+
+    @container.append @userContainer
 
     # add into dom
     @elem.before @wrapper
@@ -156,9 +161,8 @@ class Prompt
 
   loadHTML: (style) ->
     style = @getStyle(name)
-    @container = $(style.html)
-    @container.addClass "#{className}Container"
-    @text = @container.find '[data-notify=text]'
+    @userContainer = $(style.html)
+    @text = @userContainer.find '[data-notify=text]'
     if @text.length is 0
       throw "style: #{name} HTML is missing the: data-notify='text' attribute"
     @text.addClass "#{className}Text"
@@ -232,13 +236,15 @@ class Prompt
     else
       @text.empty().append(node)
 
-    @text.css
-      'color': @getColor()
-      'border-color': @getColor()
+
+    color = @getColor()
+    @container.find('[data-notify-style]').each ->
+      s = $(@).attr 'data-notify-style'
+      $(@).attr 'style', s.replace /\{\{\s*COLOR\s*\}\}/ig, color
 
     @arrow.remove() if @arrow
     @buildArrow()
-    @text.before @arrow
+    @container.prepend @arrow
 
     @showMain true
 

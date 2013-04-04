@@ -20,12 +20,12 @@ arrowDirs = {
 
 styles = {
   core: {
-    html: "<div class=\"" + className + "Wrapper\"></div>",
+    html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Container\">\n  </div>\n</div>",
     css: "." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}"
   },
   user: {
     "default": {
-      html: "<div>\n  <div class=\"" + className + "Default\" data-notify=\"text\"></div>\n</div>",
+      html: "<div class=\"" + className + "Default\" data-notify-style=\"color: {{COLOR}}; border-color: {{COLOR}};\">\n   <span data-notify=\"text\"></span>\n </div>",
       css: "." + className + "Default {\n  background: #fff;\n  font-size: 11px;\n  box-shadow: 0 0 6px #000;\n  -moz-box-shadow: 0 0 6px #000;\n  -webkit-box-shadow: 0 0 6px #000;\n  padding: 4px 10px 4px 8px;\n  border-radius: 6px;\n  border-style: solid;\n  border-width: 2px;\n  -moz-border-radius: 6px;\n  -webkit-border-radius: 6px;\n  white-space: nowrap;\n}"
     },
     bootstrap: {
@@ -97,7 +97,8 @@ Prompt = (function() {
     this.loadCSS();
     this.loadHTML();
     this.wrapper = $(styles.core.html);
-    this.wrapper.append(this.container);
+    this.container = this.wrapper.find("." + className + "Container");
+    this.container.append(this.userContainer);
     this.elem.before(this.wrapper);
     this.container.css(this.calculateCSS());
     this.run(node);
@@ -119,9 +120,8 @@ Prompt = (function() {
 
   Prompt.prototype.loadHTML = function(style) {
     style = this.getStyle(name);
-    this.container = $(style.html);
-    this.container.addClass("" + className + "Container");
-    this.text = this.container.find('[data-notify=text]');
+    this.userContainer = $(style.html);
+    this.text = this.userContainer.find('[data-notify=text]');
     if (this.text.length === 0) {
       throw "style: " + name + " HTML is missing the: data-notify='text' attribute";
     }
@@ -204,7 +204,7 @@ Prompt = (function() {
   };
 
   Prompt.prototype.run = function(node, options) {
-    var t;
+    var color, t;
     if ($.isPlainObject(options)) {
       $.extend(this.options, options);
     } else if ($.type(options) === 'string') {
@@ -221,15 +221,17 @@ Prompt = (function() {
     } else {
       this.text.empty().append(node);
     }
-    this.text.css({
-      'color': this.getColor(),
-      'border-color': this.getColor()
+    color = this.getColor();
+    this.container.find('[data-notify-style]').each(function() {
+      var s;
+      s = $(this).attr('data-notify-style');
+      return $(this).attr('style', s.replace(/\{\{\s*COLOR\s*\}\}/ig, color));
     });
     if (this.arrow) {
       this.arrow.remove();
     }
     this.buildArrow();
-    this.text.before(this.arrow);
+    this.container.prepend(this.arrow);
     this.showMain(true);
     if (this.options.autoHidePrompt) {
       clearTimeout(this.elem.data('mainTimer'));
