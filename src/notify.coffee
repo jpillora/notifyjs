@@ -11,69 +11,64 @@ arrowDirs =
   left: 'right'
   right: 'left'
 
-coreStyle =
-  html: """
-    <div class="#{className}Wrapper">
-      <div class="#{className}Main">
-        <div class="#{className}Content">
+styles =
+  core:
+    html: """
+      <div class="#{className}Wrapper"></div>
+    """
+    css: """
+      .#{className}Wrapper {
+        z-index: 1;
+        position: absolute;
+        display: inline-block;
+        height: 0;
+        width: 0;
+      }
+
+      .#{className}Container {
+        display: none;
+        z-index: 1;
+        position: absolute;
+        cursor: pointer;
+      }
+
+      .#{className}Text {
+        position: relative;
+      }
+    """
+  user:
+    default:
+      html: """
+        <div>
+          <div class="#{className}Default" data-notify="text"></div>
         </div>
-      </div>
-    </div>
-  """
-  css: """
-    .#{className}Wrapper {
-      z-index: 1;
-      position: absolute;
-      display: inline-block;
-      height: 0;
-      width: 0;
-    }
+      """
+      css: """
+        .#{className}Default {
+          background: #fff;
+          font-size: 11px;
+          box-shadow: 0 0 6px #000;
+          -moz-box-shadow: 0 0 6px #000;
+          -webkit-box-shadow: 0 0 6px #000;
+          padding: 4px 10px 4px 8px;
+          border-radius: 6px;
+          border-style: solid;
+          border-width: 2px;
+          -moz-border-radius: 6px;
+          -webkit-border-radius: 6px;
+          white-space: nowrap;
+        }
+      """
 
-    .#{className}Main {
-      display: none;
-      z-index: 1;
-      position: absolute;
-      cursor: pointer;
-    }
-
-    .#{className}Content {
-      background: #fff;
-      position: relative;
-      font-size: 11px;
-      box-shadow: 0 0 6px #000;
-      -moz-box-shadow: 0 0 6px #000;
-      -webkit-box-shadow: 0 0 6px #000;
-      padding: 4px 10px 4px 8px;
-      border-radius: 6px;
-      border-style: solid;
-      border-width: 2px;
-      -moz-border-radius: 6px;
-      -webkit-border-radius: 6px;
-      white-space: nowrap;
-    }
-  """
-
-userStyles =
-
-  default:
-    html: """
-      <span>test</span>
-    """
-    css: """
-      body {
-        test: 42
-      }
-    """
-
-  bootstrap: 
-    html: """
-      <span>test</span>
-    """
-    css: """
-      body {
-        test: 42
-      }
-    """
+    bootstrap: 
+      html: """
+        <span>test</span>
+      """
+      css: """
+        body {
+          test: 42
+        }
+      """
 
 #overridable options
 pluginOptions =
@@ -82,6 +77,8 @@ pluginOptions =
   arrowShow: true
   arrowSize: 5
   arrowPosition: 'top'
+  # Default style
+  style: 'default'
   # Default color
   color: 'red'
   # Color mappings
@@ -104,8 +101,7 @@ create = (tag) ->
   $ document.createElement(tag)
 
 # inherit plugin options
-Options = (options) ->
-  $.extend @, options if $.isPlainObject(options)
+Options = (options) -> $.extend @, options
 Options:: = pluginOptions
 
   #gets first on n radios, and gets the fancy stylised input for hidden inputs
@@ -127,20 +123,45 @@ class Prompt
   constructor: (elem, node, options) ->
     options = {color: options} if $.type(options) is 'string'
     @options = new Options if $.isPlainObject(options) then options else {}
+
     @elementType = elem.attr('type')
     @originalElement = elem
     @elem = getAnchorElement(elem)
     @elem.data pluginName, @
-    
-    @wrapper = $(coreStyle.html)
-    @main = @wrapper.find ".#{className}Main"
-    @content = @main.find ".#{className}Content"
+
+    #load user css into dom
+    @loadCSS()
+    #load user html into @container
+    @loadHTML()
+
+    @wrapper = $(styles.core.html)
+    @wrapper.append @container
 
     # add into dom
     @elem.before @wrapper
-    @main.css @calculateCSS()
+    @container.css @calculateCSS()
 
     @run(node)
+
+  loadCSS: (style) ->
+    name = @options.style
+    style = @getStyle(name)
+    elem = style.cssElem
+    if elem
+      elem.html style.css
+    else
+      elem = create("style").attr('id', "#{name}-styles").html style.css
+      $("head").append elem
+      style.cssElem = elem
+
+  loadHTML: (style) ->
+    style = @getStyle(name)
+    @container = $(style.html)
+    @container.addClass "#{className}Container"
+    @text = @container.find '[data-notify=text]'
+    if @text.length is 0
+      throw "style: #{name} HTML is missing the: data-notify='text' attribute"
+    @text.addClass "#{className}Text"
 
   buildArrow: ->
     dir = @options.arrowPosition
@@ -164,15 +185,15 @@ class Prompt
     if showArrow then @arrow.show() else @arrow.hide()
 
   showMain: (show) ->
-    hidden = @main.parent().parents(':hidden').length > 0
-    @main.show()  if hidden and show
-    @main.hide()  if hidden and not show
-    @main[@options.showAnimation] @options.showDuration  if not hidden and show
-    @main[@options.hideAnimation] @options.hideDuration  if not hidden and not show
+    hidden = @container.parent().parents(':hidden').length > 0
+    @container.show()  if hidden and show
+    @container.hide()  if hidden and not show
+    @container[@options.showAnimation] @options.showDuration  if not hidden and show
+    @container[@options.hideAnimation] @options.hideDuration  if not hidden and not show
 
   calculateCSS: () ->
     elementPosition = @elem.position()
-    mainPosition = @main.parent().position()
+    mainPosition = @container.parent().position()
     height = @elem.outerHeight()
     left = elementPosition.left - mainPosition.left
     height += (elementPosition.top - mainPosition.top)  unless navigator.userAgent.match /MSIE/
@@ -184,6 +205,12 @@ class Prompt
   getColor: ->
     @options.colors[@options.color] or @options.color
 
+  getStyle: (name) ->
+    name = @options.style unless name
+    style = styles.user[name]
+    throw "Missing style: #{name}" unless style
+    style
+
   #run plugin
   run: (node, options) ->
     #update options
@@ -193,25 +220,25 @@ class Prompt
     else if $.type(options) is 'string'
       @options.color = options
 
-    if @main and not node
+    if @container and not node
       @showMain false #hide
       return
-    else if not @main and not node
+    else if not @container and not node
       return
 
     #update content
     if $.type(node) is 'string'
-      @content.html node.replace('\n', '<br/>')
+      @text.html node.replace('\n', '<br/>')
     else
-      @content.empty().append(node)
+      @text.empty().append(node)
 
-    @content.css
+    @text.css
       'color': @getColor()
       'border-color': @getColor()
 
     @arrow.remove() if @arrow
     @buildArrow()
-    @content.before @arrow
+    @text.before @arrow
 
     @showMain true
 
@@ -225,8 +252,8 @@ class Prompt
 
 #when ready, bind permanent hide listener
 $ ->
-
-  $("head").append(create("style").html(coreStyle.css))
+  #add core styles
+  $("head").append(create("style").html(styles.core.css))
 
   $(document).on 'click', ".#{className}", ->
     inst = getAnchorElement($(@)).data pluginName
@@ -243,7 +270,7 @@ $[pluginName].options = (options) ->
   $.extend pluginOptions, options
 
 $[pluginName].addStyle = (s) ->
-  $.extend true, userStyles, s
+  $.extend true, styles.user, s
 
 # $( ... ).pluginName( { .. } ) creates a cached instance on each
 # selected item with custom options for just that instance

@@ -5,7 +5,7 @@
 (function(window,document,undefined) {
 'use strict';
 
-var Options, Prompt, arrowDirs, className, coreStyle, create, getAnchorElement, pluginName, pluginOptions, userStyles;
+var Options, Prompt, arrowDirs, className, create, getAnchorElement, pluginName, pluginOptions, styles;
 
 pluginName = 'notify';
 
@@ -18,19 +18,20 @@ arrowDirs = {
   right: 'left'
 };
 
-coreStyle = {
-  html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Main\">\n    <div class=\"" + className + "Content\">\n    </div>\n  </div>\n</div>",
-  css: "." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Main {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Content {\n  background: #fff;\n  position: relative;\n  font-size: 11px;\n  box-shadow: 0 0 6px #000;\n  -moz-box-shadow: 0 0 6px #000;\n  -webkit-box-shadow: 0 0 6px #000;\n  padding: 4px 10px 4px 8px;\n  border-radius: 6px;\n  border-style: solid;\n  border-width: 2px;\n  -moz-border-radius: 6px;\n  -webkit-border-radius: 6px;\n  white-space: nowrap;\n}"
-};
-
-userStyles = {
-  "default": {
-    html: "<span>test</span>",
-    css: "body {\n  test: 42\n}"
+styles = {
+  core: {
+    html: "<div class=\"" + className + "Wrapper\"></div>",
+    css: "." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}"
   },
-  bootstrap: {
-    html: "<span>test</span>",
-    css: "body {\n  test: 42\n}"
+  user: {
+    "default": {
+      html: "<div>\n  <div class=\"" + className + "Default\" data-notify=\"text\"></div>\n</div>",
+      css: "." + className + "Default {\n  background: #fff;\n  font-size: 11px;\n  box-shadow: 0 0 6px #000;\n  -moz-box-shadow: 0 0 6px #000;\n  -webkit-box-shadow: 0 0 6px #000;\n  padding: 4px 10px 4px 8px;\n  border-radius: 6px;\n  border-style: solid;\n  border-width: 2px;\n  -moz-border-radius: 6px;\n  -webkit-border-radius: 6px;\n  white-space: nowrap;\n}"
+    },
+    bootstrap: {
+      html: "<span>test</span>",
+      css: "body {\n  test: 42\n}"
+    }
   }
 };
 
@@ -40,6 +41,7 @@ pluginOptions = {
   arrowShow: true,
   arrowSize: 5,
   arrowPosition: 'top',
+  style: 'default',
   color: 'red',
   colors: {
     red: '#ee0101',
@@ -59,9 +61,7 @@ create = function(tag) {
 };
 
 Options = function(options) {
-  if ($.isPlainObject(options)) {
-    return $.extend(this, options);
-  }
+  return $.extend(this, options);
 };
 
 Options.prototype = pluginOptions;
@@ -94,13 +94,39 @@ Prompt = (function() {
     this.originalElement = elem;
     this.elem = getAnchorElement(elem);
     this.elem.data(pluginName, this);
-    this.wrapper = $(coreStyle.html);
-    this.main = this.wrapper.find("." + className + "Main");
-    this.content = this.main.find("." + className + "Content");
+    this.loadCSS();
+    this.loadHTML();
+    this.wrapper = $(styles.core.html);
+    this.wrapper.append(this.container);
     this.elem.before(this.wrapper);
-    this.main.css(this.calculateCSS());
+    this.container.css(this.calculateCSS());
     this.run(node);
   }
+
+  Prompt.prototype.loadCSS = function(style) {
+    var elem, name;
+    name = this.options.style;
+    style = this.getStyle(name);
+    elem = style.cssElem;
+    if (elem) {
+      return elem.html(style.css);
+    } else {
+      elem = create("style").attr('id', "" + name + "-styles").html(style.css);
+      $("head").append(elem);
+      return style.cssElem = elem;
+    }
+  };
+
+  Prompt.prototype.loadHTML = function(style) {
+    style = this.getStyle(name);
+    this.container = $(style.html);
+    this.container.addClass("" + className + "Container");
+    this.text = this.container.find('[data-notify=text]');
+    if (this.text.length === 0) {
+      throw "style: " + name + " HTML is missing the: data-notify='text' attribute";
+    }
+    return this.text.addClass("" + className + "Text");
+  };
 
   Prompt.prototype.buildArrow = function() {
     var alt, d, dir, showArrow, size;
@@ -131,25 +157,25 @@ Prompt = (function() {
 
   Prompt.prototype.showMain = function(show) {
     var hidden;
-    hidden = this.main.parent().parents(':hidden').length > 0;
+    hidden = this.container.parent().parents(':hidden').length > 0;
     if (hidden && show) {
-      this.main.show();
+      this.container.show();
     }
     if (hidden && !show) {
-      this.main.hide();
+      this.container.hide();
     }
     if (!hidden && show) {
-      this.main[this.options.showAnimation](this.options.showDuration);
+      this.container[this.options.showAnimation](this.options.showDuration);
     }
     if (!hidden && !show) {
-      return this.main[this.options.hideAnimation](this.options.hideDuration);
+      return this.container[this.options.hideAnimation](this.options.hideDuration);
     }
   };
 
   Prompt.prototype.calculateCSS = function() {
     var elementPosition, height, left, mainPosition;
     elementPosition = this.elem.position();
-    mainPosition = this.main.parent().position();
+    mainPosition = this.container.parent().position();
     height = this.elem.outerHeight();
     left = elementPosition.left - mainPosition.left;
     if (!navigator.userAgent.match(/MSIE/)) {
@@ -165,6 +191,18 @@ Prompt = (function() {
     return this.options.colors[this.options.color] || this.options.color;
   };
 
+  Prompt.prototype.getStyle = function(name) {
+    var style;
+    if (!name) {
+      name = this.options.style;
+    }
+    style = styles.user[name];
+    if (!style) {
+      throw "Missing style: " + name;
+    }
+    return style;
+  };
+
   Prompt.prototype.run = function(node, options) {
     var t;
     if ($.isPlainObject(options)) {
@@ -172,18 +210,18 @@ Prompt = (function() {
     } else if ($.type(options) === 'string') {
       this.options.color = options;
     }
-    if (this.main && !node) {
+    if (this.container && !node) {
       this.showMain(false);
       return;
-    } else if (!this.main && !node) {
+    } else if (!this.container && !node) {
       return;
     }
     if ($.type(node) === 'string') {
-      this.content.html(node.replace('\n', '<br/>'));
+      this.text.html(node.replace('\n', '<br/>'));
     } else {
-      this.content.empty().append(node);
+      this.text.empty().append(node);
     }
-    this.content.css({
+    this.text.css({
       'color': this.getColor(),
       'border-color': this.getColor()
     });
@@ -191,7 +229,7 @@ Prompt = (function() {
       this.arrow.remove();
     }
     this.buildArrow();
-    this.content.before(this.arrow);
+    this.text.before(this.arrow);
     this.showMain(true);
     if (this.options.autoHidePrompt) {
       clearTimeout(this.elem.data('mainTimer'));
@@ -207,7 +245,7 @@ Prompt = (function() {
 })();
 
 $(function() {
-  $("head").append(create("style").html(coreStyle.css));
+  $("head").append(create("style").html(styles.core.css));
   return $(document).on('click', "." + className, function() {
     var inst;
     inst = getAnchorElement($(this)).data(pluginName);
@@ -226,7 +264,7 @@ $[pluginName].options = function(options) {
 };
 
 $[pluginName].addStyle = function(s) {
-  return $.extend(true, userStyles, s);
+  return $.extend(true, styles.user, s);
 };
 
 $.fn[pluginName] = function(node, options) {
