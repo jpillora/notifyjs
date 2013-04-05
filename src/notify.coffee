@@ -103,7 +103,7 @@ styles =
       css: """
         .#{className}Bootstrap {
           white-space: nowrap;
-          margin-bottom: 5px !important;
+          margin: 5px !important;
           padding-left: 25px !important;
           background-repeat: no-repeat;
           background-position: 3px 7px;
@@ -225,17 +225,27 @@ class Notification
       throw "style: #{name} HTML is missing the: data-notify='text' attribute"
     @text.addClass "#{className}Text"
 
-  show: (show) ->
-
-
+  show: (show, callback = $.noop) ->
 
     hidden = @container.parent().parents(':hidden').length > 0
     
     elems = @container.add @arrow
-    elems.show()  if hidden and show
-    elems.hide()  if hidden and not show
-    elems[@options.showAnimation] @options.showDuration  if not hidden and show
-    elems[@options.hideAnimation] @options.hideDuration  if not hidden and not show
+    args = []
+
+    if hidden and show
+      fn = 'show'
+    else if hidden and not show
+      fn = 'hide'
+    else if not hidden and show
+      fn = @options.showAnimation
+      args.push @options.showDuration
+    else if not hidden and not show
+      fn = @options.hideAnimation
+      args.push @options.hideDuration
+
+    args.push callback
+
+    elems[fn].apply elems, callback 
 
   updatePosition: ->
     return unless @elem
@@ -358,6 +368,10 @@ class Notification
         @show false
       , @options.autoHideDelay
 
+  destroy: ->
+    @show false, =>
+      @wrapper.remove()
+
 #when ready
 $ ->
   #corner notification container
@@ -376,7 +390,11 @@ $ ->
   #watch all notifications clicks
   $(document).on 'click', ".#{className}Wrapper", ->
     inst = $(@).data className
-    inst.show false if inst
+    return unless inst
+    if inst.elem
+      inst.show false
+    else
+      inst.destroy()
 
 # publicise jquery plugin
 # return alert "$.#{pluginName} already defined" if $[pluginName]?
