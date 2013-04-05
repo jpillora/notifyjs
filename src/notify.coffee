@@ -15,8 +15,8 @@ styles =
   core:
     html: """
       <div class="#{className}Wrapper">
-        <div class="#{className}Container">
-        </div>
+        <div class="#{className}Arrow"></div>
+        <div class="#{className}Container"></div>
       </div>
     """
     css: """
@@ -34,7 +34,6 @@ styles =
         display: block;
         height: inherit;
         width: inherit;
-
       }
 
       .#{className}Wrapper {
@@ -56,6 +55,16 @@ styles =
       .#{className}Text {
         position: relative;
       }
+
+      .#{className}Arrow {
+        margin-top: #{2 + (if document.documentMode is 5 then (size*-4) else 0)};
+        position: absolute;
+        z-index: 2;
+        margin-left: 10px;
+        width: 0;
+        height: 0;
+      }
+
     """
   user:
     default:
@@ -88,26 +97,33 @@ styles =
     bootstrap: 
       html: """
         <div class="alert alert-error #{className}Bootstrap">
-          <strong>Warning!</strong> <span data-notify="text"></span>
+          <strong data-notify="text"></strong>
         </div>
       """
       css: """
         .#{className}Bootstrap {
           white-space: nowrap;
+          margin-bottom: 5px !important;
+          padding-left: 25px !important;
+          background-repeat: no-repeat;
+          background-position: 3px 7px;
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtRJREFUeNqkVc1u00AQHq+dOD+0poIQfkIjalW0SEGqRMuRnHos3DjwAH0ArlyQeANOOSMeAA5VjyBxKBQhgSpVUKKQNGloFdw4cWw2jtfMOna6JOUArDTazXi/b3dm55socPqQhFka++aHBsI8GsopRJERNFlY88FCEk9Yiwf8RhgRyaHFQpPHCDmZG5oX2ui2yilkcTT1AcDsbYC1NMAyOi7zTX2Agx7A9luAl88BauiiQ/cJaZQfIpAlngDcvZZMrl8vFPK5+XktrWlx3/ehZ5r9+t6e+WVnp1pxnNIjgBe4/6dAysQc8dsmHwPcW9C0h3fW1hans1ltwJhy0GxK7XZbUlMp5Ww2eyan6+ft/f2FAqXGK4CvQk5HueFz7D6GOZtIrK+srupdx1GRBBqNBtzc2AiMr7nPplRdKhb1q6q6zjFhrklEFOUutoQ50xcX86ZlqaZpQrfbBdu2R6/G19zX6XSgh6RX5ubyHCM8nqSID6ICrGiZjGYYxojEsiw4PDwMSL5VKsC8Yf4VRYFzMzMaxwjlJSlCyAQ9l0CW44PBADzXhe7xMdi9HtTrdYjFYkDQL0cn4Xdq2/EAE+InCnvADTf2eah4Sx9vExQjkqXT6aAERICMewd/UAp/IeYANM2joxt+q5VI+ieq2i0Wg3l6DNzHwTERPgo1ko7XBXj3vdlsT2F+UuhIhYkp7u7CarkcrFOCtR3H5JiwbAIeImjT/YQKKBtGjRFCU5IUgFRe7fF4cCNVIPMYo3VKqxwjyNAXNepuopyqnld602qVsfRpEkkz+GFL1wPj6ySXBpJtWVa5xlhpcyhBNwpZHmtX8AGgfIExo0ZpzkWVTBGiXCSEaHh62/PoR0p/vHaczxXGnj4bSo+G78lELU80h1uogBwWLf5YlsPmgDEd4M236xjm+8nm4IuE/9u+/PH2JXZfbwz4zw1WbO+SQPpXfwG/BBgAhCNZiSb/pOQAAAAASUVORK5CYII=);
         }
       """
       colors:
         red: '#eed3d7'
 
+
+bootstrapDetected = false
 #overridable options
 pluginOptions =
   autoHide: false
   autoHideDelay: 2000
   arrowShow: true
   arrowSize: 5
-  arrowPosition: 'top'
+  position: null
   # Default style
-  style: 'default'
+  style: null
   # Default color
   color: 'red'
   # Color mappings
@@ -117,11 +133,12 @@ pluginOptions =
     black: '#393939'
     blue: '#00f'
   showAnimation: 'slideDown'
-  showDuration: 200
+  showDuration: 400
   hideAnimation: 'slideUp'
-  hideDuration: 600
+  hideDuration: 200
   # Gap between main and element
-  gap: 2
+  offsetY: 2
+  offsetX: 0
   #TODO add z-index watches
   #parents:  { '.ui-dialog': 5001 }
 
@@ -129,9 +146,10 @@ pluginOptions =
 create = (tag) ->
   $ document.createElement(tag)
 
-# inherit plugin options
-Options = (options) -> $.extend @, options
-Options:: = pluginOptions
+inherit = (a, b) ->
+  F = () ->
+  F.prototype = a
+  $.extend true, new F(), b
 
 # container for element-less notifications
 cornerElem = create("div").addClass("#{className}Corner")
@@ -148,13 +166,23 @@ getAnchorElement = (element) ->
   element = fBefore  if fBefore.is('span.styled,span.OBS_checkbox')
   element
 
+insertCSS = (style) ->
+  return unless style and style.css
+  elem = style.cssElem
+  if elem
+    elem.html style.css
+  else
+    elem = create("style").attr('type','text/css').html style.css
+    $("head").append elem
+    style.cssElem = elem
+
 #define plugin
 class Notification
   
   #setup instance variables
   constructor: (elem, data, options) ->
-    options = {color: options} if $.type(options) is 'string'
-    @options = new Options if $.isPlainObject(options) then options else {}
+    options = {color: options} if typeof options is 'string'
+    @options = inherit pluginOptions, if $.isPlainObject(options) then options else {}
 
     #load user css into dom
     @loadCSS()
@@ -163,6 +191,7 @@ class Notification
 
     @wrapper = $(styles.core.html)
     @wrapper.data pluginName, @
+    @arrow = @wrapper.find ".#{className}Arrow"
     @container = @wrapper.find ".#{className}Container"
     @container.append @userContainer
 
@@ -173,7 +202,6 @@ class Notification
       @elem.data pluginName, @
       # add into dom above elem
       @elem.before @wrapper
-      @container.css @calculateCSS()
     else
       # @options.autoHide = true
       @options.arrowShow = false
@@ -183,15 +211,11 @@ class Notification
     @run(data)
 
   loadCSS: (style) ->
-    name = @options.style
-    style = @getStyle(name)
-    elem = style.cssElem
-    if elem
-      elem.html style.css
-    else
-      elem = create("style").attr('id', "#{name}-styles").html style.css
-      $("head").append elem
-      style.cssElem = elem
+    unless style
+      name = @options.style
+      style = @getStyle(name)
+    #insert
+    insertCSS style
 
   loadHTML: (style) ->
     style = @getStyle(name)
@@ -201,27 +225,6 @@ class Notification
       throw "style: #{name} HTML is missing the: data-notify='text' attribute"
     @text.addClass "#{className}Text"
 
-  buildArrow: ->
-    dir = @options.arrowPosition
-    size = @options.arrowSize
-    alt = arrowDirs[dir]
-    @arrow = create("div")
-    @arrow.addClass(className + 'Arrow').css(
-      'margin-top': 2 + (if document.documentMode is 5 then (size*-4) else 0)
-      'position': 'relative'
-      'z-index': '2'
-      'margin-left': 10
-      'width': 0
-      'height': 0
-    ).css(
-      'border-' + alt, size + 'px solid ' + @getColor()
-    )
-    for d of arrowDirs
-      @arrow.css 'border-' + d, size + 'px solid transparent'  if d isnt dir and d isnt alt
-
-    showArrow = @options.arrowShow and @elementType isnt 'radio'
-    if showArrow then @arrow.show() else @arrow.hide()
-
   show: (show) ->
     hidden = @container.parent().parents(':hidden').length > 0
     @container.show()  if hidden and show
@@ -229,16 +232,61 @@ class Notification
     @container[@options.showAnimation] @options.showDuration  if not hidden and show
     @container[@options.hideAnimation] @options.hideDuration  if not hidden and not show
 
-  calculateCSS: () ->
+  updatePosition: ->
+    return unless @elem
+    #
     elementPosition = @elem.position()
-    mainPosition = @container.parent().position()
-    height = @elem.outerHeight()
-    left = elementPosition.left - mainPosition.left
+    mainPosition = @wrapper.position()
+    
+    #
+    position = @getPosition()
+    arrowPosition = @updateArrow(position)
+
+    #start calculations
+    left = 0
+    height = 0
+    switch position
+      when 'bottom'
+        height = @elem.outerHeight()
+      when 'right'
+        left = @elem.width()
+      else
+        throw "Unknown position: #{position}"
+
+    #elem vs wrapper corrections
+    left += elementPosition.left - mainPosition.left
     height += (elementPosition.top - mainPosition.top)  unless navigator.userAgent.match /MSIE/
-    return {
-      top: height + @options.gap
-      left: left
-    }
+    
+    #set with user offset, with arrow offet
+    @container.css
+      top: height + @options.offsetY + arrowPosition.top
+      left: left + @options.offsetX + arrowPosition.left
+
+  updateArrow: (position) ->
+    
+    offsets = {top: 0, left: 0}
+
+    unless @options.arrowShow and @elementType isnt 'radio'
+      @arrow.hide()
+      return offsets 
+
+    dir = arrowDirs[position]
+    size = @options.arrowSize
+
+    @arrow.css 'border-' + position, size + 'px solid ' + @getColor()
+    for d of arrowDirs
+      if d isnt dir and d isnt position
+        @arrow.css 'border-' + d, size + 'px solid transparent'  
+
+    @arrow.show()
+    offsets
+
+
+  getPosition: ->
+    return @options.position if @options.position
+    if @elem.position().left + @elem.width() + @wrapper.width() < $(window).width()
+      return 'right'
+    return 'bottom'
 
   getColor: ->
     styleColors = @getStyle().colors
@@ -249,9 +297,18 @@ class Notification
 
   getStyle: (name) ->
     name = @options.style unless name
+    name = 'bootstrap' if bootstrapDetected and not name
+    name = 'default' unless name
     style = styles.user[name]
     throw "Missing style: #{name}" unless style
     style
+
+  updateStyle: ->
+    #update colors
+    @wrapper.find('[data-notify-style]').each (i,e) =>
+      $(e).attr 'style', $(e).attr('data-notify-style').
+        replace(/\{\{\s*color\s*\}\}/ig, @getColor()).
+        replace(/\{\{\s*position\s*\}\}/ig, @getPosition())
 
   #run plugin
   run: (data, options) ->
@@ -274,14 +331,8 @@ class Notification
     else
       @text.empty().append(data)
 
-    color = @getColor()
-    @container.find('[data-notify-style]').each ->
-      s = $(@).attr 'data-notify-style'
-      $(@).attr 'style', s.replace /\{\{\s*color\s*\}\}/ig, color
 
-    @arrow.remove() if @arrow
-    @buildArrow()
-    @container.prepend @arrow
+    @updatePosition()
 
     @show true
 
@@ -300,10 +351,11 @@ $ ->
   $("link").each ->
     src =  $(@).attr 'href'
     if src.match /bootstrap[^\/]*\.css/
-      $[pluginName].options {style:'bootstrap'}
+      bootstrapDetected = true
       return false
   #add core styles
-  $("head").append(create("style").html(styles.core.css))
+  insertCSS styles.core
+
   #watch all notifications clicks
   $(document).on 'click', ".#{className}Wrapper", ->
     inst = $(@).data pluginName
