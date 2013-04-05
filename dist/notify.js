@@ -43,9 +43,9 @@ bootstrapDetected = false;
 pluginOptions = {
   autoHide: false,
   autoHideDelay: 2000,
-  arrowShow: true,
+  arrowShow: false,
   arrowSize: 5,
-  position: null,
+  position: 'bottom',
   style: null,
   color: 'red',
   colors: {
