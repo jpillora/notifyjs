@@ -57,7 +57,7 @@ styles =
       }
 
       .#{className}Arrow {
-        margin-top: #{2 + (if document.documentMode is 5 then (size*-4) else 0)};
+        margin-top: #{2 + (if document.documentMode is 5 then (size*-4) else 0)}px;
         position: absolute;
         z-index: 2;
         margin-left: 10px;
@@ -190,7 +190,7 @@ class Notification
     @loadHTML()
 
     @wrapper = $(styles.core.html)
-    @wrapper.data pluginName, @
+    @wrapper.data className, @
     @arrow = @wrapper.find ".#{className}Arrow"
     @container = @wrapper.find ".#{className}Container"
     @container.append @userContainer
@@ -199,7 +199,7 @@ class Notification
       @elementType = elem.attr('type')
       @originalElement = elem
       @elem = getAnchorElement(elem)
-      @elem.data pluginName, @
+      @elem.data className, @
       # add into dom above elem
       @elem.before @wrapper
     else
@@ -226,11 +226,16 @@ class Notification
     @text.addClass "#{className}Text"
 
   show: (show) ->
+
+
+
     hidden = @container.parent().parents(':hidden').length > 0
-    @container.show()  if hidden and show
-    @container.hide()  if hidden and not show
-    @container[@options.showAnimation] @options.showDuration  if not hidden and show
-    @container[@options.hideAnimation] @options.hideDuration  if not hidden and not show
+    
+    elems = @container.add @arrow
+    elems.show()  if hidden and show
+    elems.hide()  if hidden and not show
+    elems[@options.showAnimation] @options.showDuration  if not hidden and show
+    elems[@options.hideAnimation] @options.hideDuration  if not hidden and not show
 
   updatePosition: ->
     return unless @elem
@@ -240,47 +245,57 @@ class Notification
     
     #
     position = @getPosition()
-    arrowPosition = @updateArrow(position)
 
     #start calculations
-    left = 0
-    height = 0
+    p =
+      top: 0
+      left: 0
     switch position
       when 'bottom'
-        height = @elem.outerHeight()
+        p.top += @elem.outerHeight()
       when 'right'
-        left = @elem.width()
+        p.left += @elem.width()
       else
         throw "Unknown position: #{position}"
 
     #elem vs wrapper corrections
-    left += elementPosition.left - mainPosition.left
-    height += (elementPosition.top - mainPosition.top)  unless navigator.userAgent.match /MSIE/
+    p.top += (elementPosition.top - mainPosition.top)  unless navigator.userAgent.match /MSIE/
+    p.left += elementPosition.left - mainPosition.left
     
-    #set with user offset, with arrow offet
-    @container.css
-      top: height + @options.offsetY + arrowPosition.top
-      left: left + @options.offsetX + arrowPosition.left
+    #set user offset
+    p.top += @options.offsetY
+    p.left += @options.offsetX
 
-  updateArrow: (position) ->
-    
-    offsets = {top: 0, left: 0}
+    @updateArrow p, position
+
+    # if @setCSS
+    #   @container.stop().animate(p)
+    # else
+    @container.css p
+    # @setCSS = true
+
+  updateArrow: (p, position) ->
 
     unless @options.arrowShow and @elementType isnt 'radio'
       @arrow.hide()
-      return offsets 
+      return 
 
     dir = arrowDirs[position]
     size = @options.arrowSize
 
     @arrow.css 'border-' + position, size + 'px solid ' + @getColor()
+    @arrow.css p
     for d of arrowDirs
       if d isnt dir and d isnt position
         @arrow.css 'border-' + d, size + 'px solid transparent'  
 
-    @arrow.show()
-    offsets
+    switch position
+      when 'bottom'
+        p.top += size
+      when 'right'
+        p.left += size
 
+    @arrow.show()
 
   getPosition: ->
     return @options.position if @options.position
@@ -343,22 +358,24 @@ class Notification
         @show false
       , @options.autoHideDelay
 
-#when ready, bind permanent hide listener
+#when ready
 $ ->
+  #corner notification container
   $("body").append cornerElem
 
   #auto-detect bootstrap
   $("link").each ->
     src =  $(@).attr 'href'
-    if src.match /bootstrap[^\/]*\.css/
+    if src.match /bootstrap/
       bootstrapDetected = true
       return false
+
   #add core styles
   insertCSS styles.core
 
   #watch all notifications clicks
   $(document).on 'click', ".#{className}Wrapper", ->
-    inst = $(@).data pluginName
+    inst = $(@).data className
     inst.show false if inst
 
 # publicise jquery plugin
@@ -373,19 +390,17 @@ $[pluginName] = (elem, data, options) ->
     data = elem
     new Notification null, data, options 
 
-# publicise options method
+# publicise methods
 $[pluginName].options = (options) ->
   $.extend pluginOptions, options
 
-$[pluginName].addStyle = (s) ->
+$[pluginName].styles = (s) ->
   $.extend true, styles.user, s
 
 # $( ... ).pluginName( { .. } ) creates a cached instance on each
-# selected item with custom options for just that instance
-# return alert "$.fn#{pluginName} already defined" if $.fn[pluginName]?
 $.fn[pluginName] = (data, options) ->
   $(@).each ->
-    inst = getAnchorElement($(@)).data pluginName
+    inst = getAnchorElement($(@)).data className
     if inst
       inst.run data, options
     else

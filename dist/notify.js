@@ -21,7 +21,7 @@ arrowDirs = {
 styles = {
   core: {
     html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
-    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n  opacity: 0.85;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  margin-top: " + (2 + (document.documentMode === 5 ? size * -4 : 0)) + ";\n  position: absolute;\n  z-index: 2;\n  margin-left: 10px;\n  width: 0;\n  height: 0;\n}\n"
+    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n  opacity: 0.85;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  margin-top: " + (2 + (document.documentMode === 5 ? size * -4 : 0)) + "px;\n  position: absolute;\n  z-index: 2;\n  margin-left: 10px;\n  width: 0;\n  height: 0;\n}\n"
   },
   user: {
     "default": {
@@ -117,7 +117,7 @@ Notification = (function() {
     this.loadCSS();
     this.loadHTML();
     this.wrapper = $(styles.core.html);
-    this.wrapper.data(pluginName, this);
+    this.wrapper.data(className, this);
     this.arrow = this.wrapper.find("." + className + "Arrow");
     this.container = this.wrapper.find("." + className + "Container");
     this.container.append(this.userContainer);
@@ -125,7 +125,7 @@ Notification = (function() {
       this.elementType = elem.attr('type');
       this.originalElement = elem;
       this.elem = getAnchorElement(elem);
-      this.elem.data(pluginName, this);
+      this.elem.data(className, this);
       this.elem.before(this.wrapper);
     } else {
       this.options.arrowShow = false;
@@ -155,73 +155,78 @@ Notification = (function() {
   };
 
   Notification.prototype.show = function(show) {
-    var hidden;
+    var elems, hidden;
     hidden = this.container.parent().parents(':hidden').length > 0;
+    elems = this.container.add(this.arrow);
     if (hidden && show) {
-      this.container.show();
+      elems.show();
     }
     if (hidden && !show) {
-      this.container.hide();
+      elems.hide();
     }
     if (!hidden && show) {
-      this.container[this.options.showAnimation](this.options.showDuration);
+      elems[this.options.showAnimation](this.options.showDuration);
     }
     if (!hidden && !show) {
-      return this.container[this.options.hideAnimation](this.options.hideDuration);
+      return elems[this.options.hideAnimation](this.options.hideDuration);
     }
   };
 
   Notification.prototype.updatePosition = function() {
-    var arrowPosition, elementPosition, height, left, mainPosition, position;
+    var elementPosition, mainPosition, p, position;
     if (!this.elem) {
       return;
     }
     elementPosition = this.elem.position();
     mainPosition = this.wrapper.position();
     position = this.getPosition();
-    arrowPosition = this.updateArrow(position);
-    left = 0;
-    height = 0;
+    p = {
+      top: 0,
+      left: 0
+    };
     switch (position) {
       case 'bottom':
-        height = this.elem.outerHeight();
+        p.top += this.elem.outerHeight();
         break;
       case 'right':
-        left = this.elem.width();
+        p.left += this.elem.width();
         break;
       default:
         throw "Unknown position: " + position;
     }
-    left += elementPosition.left - mainPosition.left;
     if (!navigator.userAgent.match(/MSIE/)) {
-      height += elementPosition.top - mainPosition.top;
+      p.top += elementPosition.top - mainPosition.top;
     }
-    return this.container.css({
-      top: height + this.options.offsetY + arrowPosition.top,
-      left: left + this.options.offsetX + arrowPosition.left
-    });
+    p.left += elementPosition.left - mainPosition.left;
+    p.top += this.options.offsetY;
+    p.left += this.options.offsetX;
+    this.updateArrow(p, position);
+    return this.container.css(p);
   };
 
-  Notification.prototype.updateArrow = function(position) {
-    var d, dir, offsets, size;
-    offsets = {
-      top: 0,
-      left: 0
-    };
+  Notification.prototype.updateArrow = function(p, position) {
+    var d, dir, size;
     if (!(this.options.arrowShow && this.elementType !== 'radio')) {
       this.arrow.hide();
-      return offsets;
+      return;
     }
     dir = arrowDirs[position];
     size = this.options.arrowSize;
     this.arrow.css('border-' + position, size + 'px solid ' + this.getColor());
+    this.arrow.css(p);
     for (d in arrowDirs) {
       if (d !== dir && d !== position) {
         this.arrow.css('border-' + d, size + 'px solid transparent');
       }
     }
-    this.arrow.show();
-    return offsets;
+    switch (position) {
+      case 'bottom':
+        p.top += size;
+        break;
+      case 'right':
+        p.left += size;
+    }
+    return this.arrow.show();
   };
 
   Notification.prototype.getPosition = function() {
@@ -303,7 +308,7 @@ $(function() {
   $("link").each(function() {
     var src;
     src = $(this).attr('href');
-    if (src.match(/bootstrap[^\/]*\.css/)) {
+    if (src.match(/bootstrap/)) {
       bootstrapDetected = true;
       return false;
     }
@@ -311,7 +316,7 @@ $(function() {
   insertCSS(styles.core);
   return $(document).on('click', "." + className + "Wrapper", function() {
     var inst;
-    inst = $(this).data(pluginName);
+    inst = $(this).data(className);
     if (inst) {
       return inst.show(false);
     }
@@ -332,14 +337,14 @@ $[pluginName].options = function(options) {
   return $.extend(pluginOptions, options);
 };
 
-$[pluginName].addStyle = function(s) {
+$[pluginName].styles = function(s) {
   return $.extend(true, styles.user, s);
 };
 
 $.fn[pluginName] = function(data, options) {
   return $(this).each(function() {
     var inst;
-    inst = getAnchorElement($(this)).data(pluginName);
+    inst = getAnchorElement($(this)).data(className);
     if (inst) {
       return inst.run(data, options);
     } else {
