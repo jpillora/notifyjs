@@ -217,8 +217,8 @@ class Notification
     #insert
     insertCSS style
 
-  loadHTML: (style) ->
-    style = @getStyle(name)
+  loadHTML: ->
+    style = @getStyle()
     @userContainer = $(style.html)
     @text = @userContainer.find '[data-notify=text]'
     if @text.length is 0
