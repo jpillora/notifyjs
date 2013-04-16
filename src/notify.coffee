@@ -143,8 +143,8 @@ pluginOptions =
   #parents:  { '.ui-dialog': 5001 }
 
 # plugin helpers
-create = (tag) ->
-  $ document.createElement(tag)
+createElem = (tag) ->
+  $ "<#{tag}></#{tag}>"
 
 inherit = (a, b) ->
   F = () ->
@@ -152,7 +152,7 @@ inherit = (a, b) ->
   $.extend true, new F(), b
 
 # container for element-less notifications
-cornerElem = create("div").addClass("#{className}Corner")
+cornerElem = createElem("div").addClass("#{className}Corner")
 
 #gets first on n radios, and gets the fancy stylised input for hidden inputs
 getAnchorElement = (element) ->
@@ -162,19 +162,20 @@ getAnchorElement = (element) ->
       $(e).attr('name') is element.attr('name')
     element = radios.first()
   #custom-styled inputs - find thier real element
-  fBefore = element.prev()
-  element = fBefore  if fBefore.is('span.styled,span.OBS_checkbox')
   element
 
 insertCSS = (style) ->
   return unless style and style.css
   elem = style.cssElem
-  if elem
-    elem.html style.css
-  else
-    elem = create("style").attr('type','text/css').html style.css
+  unless elem
+    elem = createElem("style")
     $("head").append elem
     style.cssElem = elem
+
+  try 
+    elem.html style.css
+  catch e #ie fix
+    elem[0].styleSheet.cssText = style.css
 
 #define plugin
 class Notification
@@ -245,7 +246,7 @@ class Notification
 
     args.push callback
 
-    elems[fn].apply elems, callback 
+    elems[fn].apply elems, args 
 
   updatePosition: ->
     return unless @elem
@@ -400,8 +401,7 @@ $ ->
 # return alert "$.#{pluginName} already defined" if $[pluginName]?
 # $.pluginName( { ...  } ) changes options for all instances
 $[pluginName] = (elem, data, options) ->
-  if elem instanceof HTMLElement or
-     elem.jquery
+  if (elem and elem.nodeName) or elem.jquery
     $(elem)[pluginName](data, options)
   else
     options = data

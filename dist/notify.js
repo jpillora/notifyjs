@@ -1,11 +1,11 @@
-/** Notify.js - v0.0.1 - 2013/04/11
+/** Notify.js - v0.0.1 - 2013/04/16
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, arrowDirs, bootstrapDetected, className, cornerElem, create, getAnchorElement, inherit, insertCSS, pluginName, pluginOptions, styles;
+var Notification, arrowDirs, bootstrapDetected, className, cornerElem, createElem, getAnchorElement, inherit, insertCSS, pluginName, pluginOptions, styles;
 
 pluginName = 'notify';
 
@@ -62,8 +62,8 @@ pluginOptions = {
   offsetX: 0
 };
 
-create = function(tag) {
-  return $(document.createElement(tag));
+createElem = function(tag) {
+  return $("<" + tag + "></" + tag + ">");
 };
 
 inherit = function(a, b) {
@@ -73,19 +73,15 @@ inherit = function(a, b) {
   return $.extend(true, new F(), b);
 };
 
-cornerElem = create("div").addClass("" + className + "Corner");
+cornerElem = createElem("div").addClass("" + className + "Corner");
 
 getAnchorElement = function(element) {
-  var fBefore, radios;
+  var radios;
   if (element.is('[type=radio]')) {
     radios = element.parents('form:first').find('[type=radio]').filter(function(i, e) {
       return $(e).attr('name') === element.attr('name');
     });
     element = radios.first();
-  }
-  fBefore = element.prev();
-  if (fBefore.is('span.styled,span.OBS_checkbox')) {
-    element = fBefore;
   }
   return element;
 };
@@ -96,12 +92,15 @@ insertCSS = function(style) {
     return;
   }
   elem = style.cssElem;
-  if (elem) {
-    return elem.html(style.css);
-  } else {
-    elem = create("style").attr('type', 'text/css').html(style.css);
+  if (!elem) {
+    elem = createElem("style");
     $("head").append(elem);
-    return style.cssElem = elem;
+    style.cssElem = elem;
+  }
+  try {
+    return elem.html(style.css);
+  } catch (e) {
+    return elem[0].styleSheet.cssText = style.css;
   }
 };
 
@@ -175,7 +174,7 @@ Notification = (function() {
       args.push(this.options.hideDuration);
     }
     args.push(callback);
-    return elems[fn].apply(elems, callback);
+    return elems[fn].apply(elems, args);
   };
 
   Notification.prototype.updatePosition = function() {
@@ -342,7 +341,7 @@ $(function() {
 });
 
 $[pluginName] = function(elem, data, options) {
-  if (elem instanceof HTMLElement || elem.jquery) {
+  if ((elem && elem.nodeName) || elem.jquery) {
     return $(elem)[pluginName](data, options);
   } else {
     options = data;
