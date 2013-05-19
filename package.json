@@ -1,5 +1,6 @@
 {
   "name": "notify",
+  "version":"0.0.1",
   "devDependencies": {
     "grunt": "~0.4.x",
     "grunt-contrib-watch": "~0.1.4",
