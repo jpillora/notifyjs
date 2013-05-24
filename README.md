@@ -1,4 +1,4 @@
 
-### Notify.js - A robust, customizable notification library
+### Notify.js - A simple, versatile notification library
 
 ## http://notifyjs.com
