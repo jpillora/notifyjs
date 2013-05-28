@@ -5,11 +5,14 @@
 pluginName = 'notify'
 className = '__'+pluginName
 
+#opposites
 arrowDirs =
   top: 'bottom'
   bottom: 'top'
   left: 'right'
   right: 'left'
+  middle: null
+  center: null
 
 styles =
   core:
