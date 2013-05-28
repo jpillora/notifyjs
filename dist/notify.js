@@ -1,4 +1,4 @@
-/** Notify.js - v0.0.1 - 2013/04/16
+/** Notify.js - v0.0.1 - 2013/05/28
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */

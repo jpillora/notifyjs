@@ -2,11 +2,10 @@ fs = require("fs")
 
 #global module:false
 module.exports = (grunt) ->
-  
-  
+
   # Project configuration.
   grunt.initConfig
-    pkg: grunt.file.readJSON('component.json')
+    pkg: grunt.file.readJSON('package.json')
     banner: 
       "/** <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today(\"yyyy/mm/dd\") %>\n"+
       " * <%= pkg.homepage %>\n" +
@@ -42,7 +41,7 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-uglify"
-  grunt.loadNpmTasks "grunt-contrib-coffee"
+  grunt.loadTasks "./node_modules/grunt-contrib-coffee/tasks"
   grunt.loadNpmTasks "grunt-wrap"
 
   # Default task.

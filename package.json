@@ -1,5 +1,12 @@
 {
+  "title": "Notify.js",
   "name": "notify",
+  "version": "0.0.1",
+  "author": {
+    "name": "Jaime Pillora"
+  },
+  "homepage": "http://notifyjs.com/",
+  "license": "MIT",
   "version":"0.0.1",
   "devDependencies": {
     "grunt": "~0.4.x",
