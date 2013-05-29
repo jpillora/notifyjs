@@ -5,15 +5,25 @@
 pluginName = 'notify'
 className = '__'+pluginName
 
-#opposites
-arrowDirs =
-  top: 'bottom'
-  bottom: 'top'
-  left: 'right'
-  right: 'left'
-  middle: null
-  center: null
+#positions mapped to opposites
+vPositions =
+  t: 'b'
+  m: null
+  b: 't'
+hPositions =
+  l: 'r'
+  c: null
+  r: 'l'
 
+parsePosition = (str) ->
+  pos = []
+  $.each str.split(/\W+/), (i,word) ->
+    w = word.toLowerCase()[0]
+    pos.push w if vPositions[w]
+    pos.push w if hPositions[w]
+  pos
+
+#built-in styles
 styles =
   core:
     html: """
@@ -60,7 +70,7 @@ styles =
       }
 
       .#{className}Arrow {
-        margin-top: #{2 + (if document.documentMode is 5 then (size*-4) else 0)}px;
+        margin-top: 2px;
         position: absolute;
         z-index: 2;
         margin-left: 10px;
@@ -100,7 +110,7 @@ styles =
     bootstrap: 
       html: """
         <div class="alert alert-error #{className}Bootstrap">
-          <strong data-notify="text"></strong>
+          <strong data-notify-text></strong>
         </div>
       """
       css: """
@@ -116,8 +126,6 @@ styles =
       colors:
         red: '#eed3d7'
 
-
-bootstrapDetected = false
 #overridable options
 pluginOptions =
   autoHide: false
@@ -146,9 +154,7 @@ pluginOptions =
   #parents:  { '.ui-dialog': 5001 }
 
 # plugin helpers
-createElem = (tag) ->
-  $ "<#{tag}></#{tag}>"
-
+createElem = (tag) -> $ "<#{tag}></#{tag}>"
 inherit = (a, b) ->
   F = () ->
   F.prototype = a
@@ -312,10 +318,22 @@ class Notification
     @arrow.show()
 
   getPosition: ->
-    return @options.position if @options.position
-    if @elem.position().left + @elem.width() + @wrapper.width() < $(window).width()
-      return 'right'
-    return 'bottom'
+    text = @options.position
+    pos = parsePosition text
+
+    #if unspecified - choose bottom left
+    pos.push 'b' if pos.length is 0
+    pos.push 'm' if pos.length is 1 and pos[0] is 'l' or pos[0] is 'r'
+    pos.push 'l' if pos.length is 1
+
+    unless @options.autoReposition
+      return pos
+
+    # if @elem.position().left + @elem.width() + @wrapper.width() < $(window).width()
+    #   return 'right'
+    # return 'bottom'
+
+    throw "Not implemented"
 
   getColor: ->
     styleColors = @getStyle().colors
@@ -336,8 +354,9 @@ class Notification
     #update colors
     @wrapper.find('[data-notify-style]').each (i,e) =>
       $(e).attr 'style', $(e).attr('data-notify-style').
-        replace(/\{\{\s*color\s*\}\}/ig, @getColor()).
-        replace(/\{\{\s*position\s*\}\}/ig, @getPosition())
+        replace(/\{\{\s*color\s*\}\}/ig, @getColor())
+        # .
+        # replace(/\{\{\s*position\s*\}\}/ig, @getPosition())
 
   #run plugin
   run: (data, options) ->
@@ -409,7 +428,8 @@ $[pluginName] = (elem, data, options) ->
   else
     options = data
     data = elem
-    new Notification null, data, options 
+    new Notification null, data, options
+  elem
 
 # publicise methods
 $[pluginName].options = (options) ->
@@ -426,4 +446,5 @@ $.fn[pluginName] = (data, options) ->
       inst.run data, options
     else
       new Notification $(@), data, options
+  @
 

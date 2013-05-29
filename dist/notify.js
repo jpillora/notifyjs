@@ -1,27 +1,48 @@
-/** Notify.js - v0.0.1 - 2013/05/28
+/** Notify.js - v0.0.1 - 2013/05/29
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, arrowDirs, bootstrapDetected, className, cornerElem, createElem, getAnchorElement, inherit, insertCSS, pluginName, pluginOptions, styles;
+var Notification, className, cornerElem, createElem, getAnchorElement, hPositions, inherit, insertCSS, parsePosition, pluginName, pluginOptions, styles, vPositions;
 
 pluginName = 'notify';
 
 className = '__' + pluginName;
 
-arrowDirs = {
-  top: 'bottom',
-  bottom: 'top',
-  left: 'right',
-  right: 'left'
+vPositions = {
+  t: 'b',
+  m: null,
+  b: 't'
+};
+
+hPositions = {
+  l: 'r',
+  c: null,
+  r: 'l'
+};
+
+parsePosition = function(str) {
+  var pos;
+  pos = [];
+  $.each(str.split(/\W+/), function(i, word) {
+    var w;
+    w = word.toLowerCase()[0];
+    if (vPositions[w]) {
+      pos.push(w);
+    }
+    if (hPositions[w]) {
+      return pos.push(w);
+    }
+  });
+  return pos;
 };
 
 styles = {
   core: {
     html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
-    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n  opacity: 0.85;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  margin-top: " + (2 + (document.documentMode === 5 ? size * -4 : 0)) + "px;\n  position: absolute;\n  z-index: 2;\n  margin-left: 10px;\n  width: 0;\n  height: 0;\n}\n"
+    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n  opacity: 0.85;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  margin-top: 2px;\n  position: absolute;\n  z-index: 2;\n  margin-left: 10px;\n  width: 0;\n  height: 0;\n}\n"
   },
   user: {
     "default": {
@@ -29,7 +50,7 @@ styles = {
       css: "." + className + "Default {\n  background: #fff;\n  font-size: 11px;\n  box-shadow: 0 0 6px #000;\n  -moz-box-shadow: 0 0 6px #000;\n  -webkit-box-shadow: 0 0 6px #000;\n  padding: 4px 10px 4px 8px;\n  border-radius: 6px;\n  border-style: solid;\n  border-width: 2px;\n  -moz-border-radius: 6px;\n  -webkit-border-radius: 6px;\n  white-space: nowrap;\n}"
     },
     bootstrap: {
-      html: "<div class=\"alert alert-error " + className + "Bootstrap\">\n  <strong data-notify=\"text\"></strong>\n</div>",
+      html: "<div class=\"alert alert-error " + className + "Bootstrap\">\n  <strong data-notify-text></strong>\n</div>",
       css: "." + className + "Bootstrap {\n  white-space: nowrap;\n  margin: 5px !important;\n  padding-left: 25px !important;\n  background-repeat: no-repeat;\n  background-position: 3px 7px;\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtRJREFUeNqkVc1u00AQHq+dOD+0poIQfkIjalW0SEGqRMuRnHos3DjwAH0ArlyQeANOOSMeAA5VjyBxKBQhgSpVUKKQNGloFdw4cWw2jtfMOna6JOUArDTazXi/b3dm55socPqQhFka++aHBsI8GsopRJERNFlY88FCEk9Yiwf8RhgRyaHFQpPHCDmZG5oX2ui2yilkcTT1AcDsbYC1NMAyOi7zTX2Agx7A9luAl88BauiiQ/cJaZQfIpAlngDcvZZMrl8vFPK5+XktrWlx3/ehZ5r9+t6e+WVnp1pxnNIjgBe4/6dAysQc8dsmHwPcW9C0h3fW1hans1ltwJhy0GxK7XZbUlMp5Ww2eyan6+ft/f2FAqXGK4CvQk5HueFz7D6GOZtIrK+srupdx1GRBBqNBtzc2AiMr7nPplRdKhb1q6q6zjFhrklEFOUutoQ50xcX86ZlqaZpQrfbBdu2R6/G19zX6XSgh6RX5ubyHCM8nqSID6ICrGiZjGYYxojEsiw4PDwMSL5VKsC8Yf4VRYFzMzMaxwjlJSlCyAQ9l0CW44PBADzXhe7xMdi9HtTrdYjFYkDQL0cn4Xdq2/EAE+InCnvADTf2eah4Sx9vExQjkqXT6aAERICMewd/UAp/IeYANM2joxt+q5VI+ieq2i0Wg3l6DNzHwTERPgo1ko7XBXj3vdlsT2F+UuhIhYkp7u7CarkcrFOCtR3H5JiwbAIeImjT/YQKKBtGjRFCU5IUgFRe7fF4cCNVIPMYo3VKqxwjyNAXNepuopyqnld602qVsfRpEkkz+GFL1wPj6ySXBpJtWVa5xlhpcyhBNwpZHmtX8AGgfIExo0ZpzkWVTBGiXCSEaHh62/PoR0p/vHaczxXGnj4bSo+G78lELU80h1uogBwWLf5YlsPmgDEd4M236xjm+8nm4IuE/9u+/PH2JXZfbwz4zw1WbO+SQPpXfwG/BBgAhCNZiSb/pOQAAAAASUVORK5CYII=);\n}",
       colors: {
         red: '#eed3d7'
@@ -37,8 +58,6 @@ styles = {
     }
   }
 };
-
-bootstrapDetected = false;
 
 pluginOptions = {
   autoHide: false,
@@ -235,13 +254,22 @@ Notification = (function() {
   };
 
   Notification.prototype.getPosition = function() {
-    if (this.options.position) {
-      return this.options.position;
+    var pos, text;
+    text = this.options.position;
+    pos = parsePosition(text);
+    if (pos.length === 0) {
+      pos.push('b');
     }
-    if (this.elem.position().left + this.elem.width() + this.wrapper.width() < $(window).width()) {
-      return 'right';
+    if (pos.length === 1 && pos[0] === 'l' || pos[0] === 'r') {
+      pos.push('m');
     }
-    return 'bottom';
+    if (pos.length === 1) {
+      pos.push('l');
+    }
+    if (!this.options.autoReposition) {
+      return pos;
+    }
+    throw "Not implemented";
   };
 
   Notification.prototype.getColor = function() {
@@ -271,7 +299,7 @@ Notification = (function() {
   Notification.prototype.updateStyle = function() {
     var _this = this;
     return this.wrapper.find('[data-notify-style]').each(function(i, e) {
-      return $(e).attr('style', $(e).attr('data-notify-style').replace(/\{\{\s*color\s*\}\}/ig, _this.getColor()).replace(/\{\{\s*position\s*\}\}/ig, _this.getPosition()));
+      return $(e).attr('style', $(e).attr('data-notify-style').replace(/\{\{\s*color\s*\}\}/ig, _this.getColor()));
     });
   };
 
@@ -318,7 +346,7 @@ Notification = (function() {
 $(function() {
   $("body").append(cornerElem);
   $("link").each(function() {
-    var src;
+    var bootstrapDetected, src;
     src = $(this).attr('href');
     if (src.match(/bootstrap/)) {
       bootstrapDetected = true;
@@ -342,12 +370,13 @@ $(function() {
 
 $[pluginName] = function(elem, data, options) {
   if ((elem && elem.nodeName) || elem.jquery) {
-    return $(elem)[pluginName](data, options);
+    $(elem)[pluginName](data, options);
   } else {
     options = data;
     data = elem;
-    return new Notification(null, data, options);
+    new Notification(null, data, options);
   }
+  return elem;
 };
 
 $[pluginName].options = function(options) {
@@ -359,7 +388,7 @@ $[pluginName].styles = function(s) {
 };
 
 $.fn[pluginName] = function(data, options) {
-  return $(this).each(function() {
+  $(this).each(function() {
     var inst;
     inst = getAnchorElement($(this)).data(className);
     if (inst) {
@@ -368,6 +397,7 @@ $.fn[pluginName] = function(data, options) {
       return new Notification($(this), data, options);
     }
   });
+  return this;
 };
 
 }(window,document));
