@@ -5,12 +5,19 @@
 pluginName = 'notify'
 className = '__'+pluginName
 
+
+positions = 
+  t: 'top'
+  m: 'middle'
+  b: 'bottom'
+  l: 'left'
+  c: 'center'
+  r: 'right'
 #positions mapped to opposites
-vPositions =
+opposites =
   t: 'b'
   m: null
   b: 't'
-hPositions =
   l: 'r'
   c: null
   r: 'l'
@@ -18,9 +25,8 @@ hPositions =
 parsePosition = (str) ->
   pos = []
   $.each str.split(/\W+/), (i,word) ->
-    w = word.toLowerCase()[0]
-    pos.push w if vPositions[w]
-    pos.push w if hPositions[w]
+    w = word.toLowerCase().charAt(0)
+    pos.push w if positions[w]
   pos
 
 #built-in styles
@@ -55,7 +61,7 @@ styles =
         display: inline-block;
         height: 0;
         width: 0;
-        opacity: 0.85;
+        border: thin solid red;
       }
 
       .#{className}Container {
@@ -87,7 +93,7 @@ styles =
               color: {{color}}; 
               border-color: {{color}};
              ">
-           <span data-notify="text"></span>
+           <span data-notify-text></span>
          </div>
       """
       css: """
@@ -134,7 +140,7 @@ pluginOptions =
   arrowSize: 5
   position: 'bottom'
   # Default style
-  style: null
+  style: 'default'
   # Default color
   color: 'red'
   # Color mappings
@@ -154,7 +160,8 @@ pluginOptions =
   #parents:  { '.ui-dialog': 5001 }
 
 # plugin helpers
-createElem = (tag) -> $ "<#{tag}></#{tag}>"
+createElem = (tag) ->
+  $ "<#{tag}></#{tag}>"
 inherit = (a, b) ->
   F = () ->
   F.prototype = a
@@ -173,13 +180,41 @@ getAnchorElement = (element) ->
   #custom-styled inputs - find thier real element
   element
 
+incr = (obj, pos, val, useOpposite = true) ->
+
+  # console.log "incr ---- #{pos} #{val} (#{typeof val})"
+
+  if typeof val is 'string'
+    val = parseInt val, 10
+  else if typeof val isnt 'number'
+    return
+
+  return if isNaN val
+
+  opp = positions[opposites[pos.charAt(0)]]  
+  temp = pos
+
+  #use the opposite if exists
+  if obj[opp] isnt `undefined`
+    return unless useOpposite
+    pos = positions[opp.charAt(0)]
+    val *= -1
+
+  if obj[pos] is `undefined`
+    obj[pos] = val
+  else
+    obj[pos] += val
+
+  console.log "incr (#{opp}>>#{temp}) #{pos} by #{val}"
+  null
+
 insertCSS = (style) ->
   return unless style and style.css
   elem = style.cssElem
-  unless elem
-    elem = createElem("style")
-    $("head").append elem
-    style.cssElem = elem
+  return if elem
+  elem = createElem("style")
+  $("head").append elem
+  style.cssElem = elem
 
   try 
     elem.html style.css
@@ -230,9 +265,9 @@ class Notification
   loadHTML: ->
     style = @getStyle()
     @userContainer = $(style.html)
-    @text = @userContainer.find '[data-notify=text]'
+    @text = @userContainer.find '[data-notify-text]'
     if @text.length is 0
-      throw "style: #{name} HTML is missing the: data-notify='text' attribute"
+      throw "style: #{name} HTML is missing the: 'data-notify-text' attribute"
     @text.addClass "#{className}Text"
 
   show: (show, callback = $.noop) ->
@@ -261,32 +296,43 @@ class Notification
     return unless @elem
     #
     elementPosition = @elem.position()
-    mainPosition = @wrapper.position()
-    
+    wrapperPosition = @wrapper.position()
+
     #
     position = @getPosition()
 
+    console.log @elem[0]
+    console.log "update position", position, " elem ", elementPosition, " main ", wrapperPosition
+
     #start calculations
-    p =
-      top: 0
-      left: 0
-    switch position
-      when 'bottom'
-        p.top += @elem.outerHeight()
-      when 'right'
-        p.left += @elem.width()
+    p = {}
+    switch position[0]
+      when 'b'
+        incr p, 'top', @elem.outerHeight()
+      when 't'
+        incr p, 'bottom', 0
+      when 'l'
+        incr p, 'right', 0
+      when 'r'
+        incr p, 'left', @elem.outerWidth()
       else
         throw "Unknown position: #{position}"
 
     #elem vs wrapper corrections
-    p.top += (elementPosition.top - mainPosition.top)  unless navigator.userAgent.match /MSIE/
-    p.left += elementPosition.left - mainPosition.left
+    unless navigator.userAgent.match /MSIE/
+      incr p, 'top', (elementPosition.top - wrapperPosition.top)
     
-    #set user offset
-    p.top += @options.offsetY
-    p.left += @options.offsetX
+    incr p, 'left', elementPosition.left - wrapperPosition.left
+    
+    # console.log "corrent margin"
+    # for pos in ['top','right','bottom','left']
+    #   incr p, pos, @elem.css("margin-#{pos}"), false
 
-    @updateArrow p, position
+    #set user offset
+    # p.top += @options.offsetY
+    # p.left += @options.offsetX
+
+    # @updateArrow p, position
 
     # if @setCSS
     #   @container.stop().animate(p)
@@ -344,7 +390,6 @@ class Notification
 
   getStyle: (name) ->
     name = @options.style unless name
-    name = 'bootstrap' if bootstrapDetected and not name
     name = 'default' unless name
     style = styles.user[name]
     throw "Missing style: #{name}" unless style
@@ -378,7 +423,6 @@ class Notification
       @text.html data.replace('\n', '<br/>')
     else
       @text.empty().append(data)
-
 
     @updatePosition()
 
@@ -438,13 +482,16 @@ $[pluginName].options = (options) ->
 $[pluginName].styles = (s) ->
   $.extend true, styles.user, s
 
+$[pluginName].insertCSS = insertCSS
+
 # $( ... ).pluginName( { .. } ) creates a cached instance on each
 $.fn[pluginName] = (data, options) ->
   $(@).each ->
-    inst = getAnchorElement($(@)).data className
+    inst = getAnchorElement($(@)).data(className)
     if inst
       inst.run data, options
     else
       new Notification $(@), data, options
+
   @
 

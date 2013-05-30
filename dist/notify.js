@@ -1,23 +1,29 @@
-/** Notify.js - v0.0.1 - 2013/05/29
+/** Notify.js - v0.0.1 - 2013/05/30
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, className, cornerElem, createElem, getAnchorElement, hPositions, inherit, insertCSS, parsePosition, pluginName, pluginOptions, styles, vPositions;
+var Notification, className, cornerElem, createElem, getAnchorElement, incr, inherit, insertCSS, opposites, parsePosition, pluginName, pluginOptions, positions, styles;
 
 pluginName = 'notify';
 
 className = '__' + pluginName;
 
-vPositions = {
-  t: 'b',
-  m: null,
-  b: 't'
+positions = {
+  t: 'top',
+  m: 'middle',
+  b: 'bottom',
+  l: 'left',
+  c: 'center',
+  r: 'right'
 };
 
-hPositions = {
+opposites = {
+  t: 'b',
+  m: null,
+  b: 't',
   l: 'r',
   c: null,
   r: 'l'
@@ -28,11 +34,8 @@ parsePosition = function(str) {
   pos = [];
   $.each(str.split(/\W+/), function(i, word) {
     var w;
-    w = word.toLowerCase()[0];
-    if (vPositions[w]) {
-      pos.push(w);
-    }
-    if (hPositions[w]) {
+    w = word.toLowerCase().charAt(0);
+    if (positions[w]) {
       return pos.push(w);
     }
   });
@@ -42,11 +45,11 @@ parsePosition = function(str) {
 styles = {
   core: {
     html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
-    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n  opacity: 0.85;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  margin-top: 2px;\n  position: absolute;\n  z-index: 2;\n  margin-left: 10px;\n  width: 0;\n  height: 0;\n}\n"
+    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n  border: thin solid red;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  margin-top: 2px;\n  position: absolute;\n  z-index: 2;\n  margin-left: 10px;\n  width: 0;\n  height: 0;\n}\n"
   },
   user: {
     "default": {
-      html: "<div class=\"" + className + "Default\" \n     data-notify-style=\"\n      color: {{color}}; \n      border-color: {{color}};\n     \">\n   <span data-notify=\"text\"></span>\n </div>",
+      html: "<div class=\"" + className + "Default\" \n     data-notify-style=\"\n      color: {{color}}; \n      border-color: {{color}};\n     \">\n   <span data-notify-text></span>\n </div>",
       css: "." + className + "Default {\n  background: #fff;\n  font-size: 11px;\n  box-shadow: 0 0 6px #000;\n  -moz-box-shadow: 0 0 6px #000;\n  -webkit-box-shadow: 0 0 6px #000;\n  padding: 4px 10px 4px 8px;\n  border-radius: 6px;\n  border-style: solid;\n  border-width: 2px;\n  -moz-border-radius: 6px;\n  -webkit-border-radius: 6px;\n  white-space: nowrap;\n}"
     },
     bootstrap: {
@@ -65,7 +68,7 @@ pluginOptions = {
   arrowShow: false,
   arrowSize: 5,
   position: 'bottom',
-  style: null,
+  style: 'default',
   color: 'red',
   colors: {
     red: '#b94a48',
@@ -105,17 +108,49 @@ getAnchorElement = function(element) {
   return element;
 };
 
+incr = function(obj, pos, val, useOpposite) {
+  var opp, temp;
+  if (useOpposite == null) {
+    useOpposite = true;
+  }
+  if (typeof val === 'string') {
+    val = parseInt(val, 10);
+  } else if (typeof val !== 'number') {
+    return;
+  }
+  if (isNaN(val)) {
+    return;
+  }
+  opp = positions[opposites[pos.charAt(0)]];
+  temp = pos;
+  if (obj[opp] !== undefined) {
+    if (!useOpposite) {
+      return;
+    }
+    pos = positions[opp.charAt(0)];
+    val *= -1;
+  }
+  if (obj[pos] === undefined) {
+    obj[pos] = val;
+  } else {
+    obj[pos] += val;
+  }
+  console.log("incr (" + opp + ">>" + temp + ") " + pos + " by " + val);
+  return null;
+};
+
 insertCSS = function(style) {
   var elem;
   if (!(style && style.css)) {
     return;
   }
   elem = style.cssElem;
-  if (!elem) {
-    elem = createElem("style");
-    $("head").append(elem);
-    style.cssElem = elem;
+  if (elem) {
+    return;
   }
+  elem = createElem("style");
+  $("head").append(elem);
+  style.cssElem = elem;
   try {
     return elem.html(style.css);
   } catch (e) {
@@ -166,9 +201,9 @@ Notification = (function() {
     var style;
     style = this.getStyle();
     this.userContainer = $(style.html);
-    this.text = this.userContainer.find('[data-notify=text]');
+    this.text = this.userContainer.find('[data-notify-text]');
     if (this.text.length === 0) {
-      throw "style: " + name + " HTML is missing the: data-notify='text' attribute";
+      throw "style: " + name + " HTML is missing the: 'data-notify-text' attribute";
     }
     return this.text.addClass("" + className + "Text");
   };
@@ -197,34 +232,36 @@ Notification = (function() {
   };
 
   Notification.prototype.updatePosition = function() {
-    var elementPosition, mainPosition, p, position;
+    var elementPosition, p, position, wrapperPosition;
     if (!this.elem) {
       return;
     }
     elementPosition = this.elem.position();
-    mainPosition = this.wrapper.position();
+    wrapperPosition = this.wrapper.position();
     position = this.getPosition();
-    p = {
-      top: 0,
-      left: 0
-    };
-    switch (position) {
-      case 'bottom':
-        p.top += this.elem.outerHeight();
+    console.log(this.elem[0]);
+    console.log("update position", position, " elem ", elementPosition, " main ", wrapperPosition);
+    p = {};
+    switch (position[0]) {
+      case 'b':
+        incr(p, 'top', this.elem.outerHeight());
         break;
-      case 'right':
-        p.left += this.elem.width();
+      case 't':
+        incr(p, 'bottom', 0);
+        break;
+      case 'l':
+        incr(p, 'right', 0);
+        break;
+      case 'r':
+        incr(p, 'left', this.elem.outerWidth());
         break;
       default:
         throw "Unknown position: " + position;
     }
     if (!navigator.userAgent.match(/MSIE/)) {
-      p.top += elementPosition.top - mainPosition.top;
+      incr(p, 'top', elementPosition.top - wrapperPosition.top);
     }
-    p.left += elementPosition.left - mainPosition.left;
-    p.top += this.options.offsetY;
-    p.left += this.options.offsetX;
-    this.updateArrow(p, position);
+    incr(p, 'left', elementPosition.left - wrapperPosition.left);
     return this.container.css(p);
   };
 
@@ -282,9 +319,6 @@ Notification = (function() {
     var style;
     if (!name) {
       name = this.options.style;
-    }
-    if (bootstrapDetected && !name) {
-      name = 'bootstrap';
     }
     if (!name) {
       name = 'default';
@@ -386,6 +420,8 @@ $[pluginName].options = function(options) {
 $[pluginName].styles = function(s) {
   return $.extend(true, styles.user, s);
 };
+
+$[pluginName].insertCSS = insertCSS;
 
 $.fn[pluginName] = function(data, options) {
   $(this).each(function() {

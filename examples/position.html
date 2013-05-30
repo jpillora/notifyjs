@@ -6,7 +6,18 @@
 
 
   <style type="text/css">
-    .box { padding: 30px; }
+    .boxes {
+      margin: 150px;
+    }
+    .box {
+      padding: 10px;
+      margin: 10px;
+      border: thin solid blue;
+      width: 100px;
+    }
+    .wrapper {
+      margin-top: 50px
+    }
   </style>
 
   <div class="boxes"></div>
@@ -19,8 +30,11 @@
 
     $.each(positions, function(i, p) {
       var box = $("<div class=\"box\">"+p+"</div>");
-      boxes.append(box);
-      box.notify(p, {pos: p});
+      boxes.append($("<div class=\"wrapper\"/>").append(box));
+
+      setTimeout(function() {
+        box.notify(p, {position: p});
+      }, 500)
     });
   </script>
 
