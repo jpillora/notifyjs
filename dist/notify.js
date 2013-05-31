@@ -1,11 +1,12 @@
-/** Notify.js - v0.0.1 - 2013/05/30
+/** Notify.js - v0.0.1 - 2013/05/31
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, className, cornerElem, createElem, getAnchorElement, incr, inherit, insertCSS, opposites, parsePosition, pluginName, pluginOptions, positions, styles;
+var Notification, className, cornerElem, createElem, getAnchorElement, hPositions, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginName, pluginOptions, positions, realign, styles, vPositions,
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 pluginName = 'notify';
 
@@ -19,6 +20,12 @@ positions = {
   c: 'center',
   r: 'right'
 };
+
+hPositions = ['l', 'c', 'r'];
+
+vPositions = ['t', 'm', 'b'];
+
+mainPositions = ['t', 'b', 'l', 'r'];
 
 opposites = {
   t: 'b',
@@ -44,8 +51,8 @@ parsePosition = function(str) {
 
 styles = {
   core: {
-    html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
-    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n  border: thin solid red;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  margin-top: 2px;\n  position: absolute;\n  z-index: 2;\n  margin-left: 10px;\n  width: 0;\n  height: 0;\n}\n"
+    html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Debug\"></div>\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
+    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Debug {\n  position: absolute;\n  border: 3px solid red;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}\n"
   },
   user: {
     "default": {
@@ -65,7 +72,7 @@ styles = {
 pluginOptions = {
   autoHide: false,
   autoHideDelay: 2000,
-  arrowShow: false,
+  arrowShow: true,
   arrowSize: 5,
   position: 'bottom',
   style: 'default',
@@ -80,7 +87,7 @@ pluginOptions = {
   showDuration: 400,
   hideAnimation: 'slideUp',
   hideDuration: 200,
-  offsetY: 2,
+  offsetY: 0,
   offsetX: 0
 };
 
@@ -108,11 +115,8 @@ getAnchorElement = function(element) {
   return element;
 };
 
-incr = function(obj, pos, val, useOpposite) {
+incr = function(obj, pos, val) {
   var opp, temp;
-  if (useOpposite == null) {
-    useOpposite = true;
-  }
   if (typeof val === 'string') {
     val = parseInt(val, 10);
   } else if (typeof val !== 'number') {
@@ -124,9 +128,6 @@ incr = function(obj, pos, val, useOpposite) {
   opp = positions[opposites[pos.charAt(0)]];
   temp = pos;
   if (obj[opp] !== undefined) {
-    if (!useOpposite) {
-      return;
-    }
     pos = positions[opp.charAt(0)];
     val *= -1;
   }
@@ -135,8 +136,18 @@ incr = function(obj, pos, val, useOpposite) {
   } else {
     obj[pos] += val;
   }
-  console.log("incr (" + opp + ">>" + temp + ") " + pos + " by " + val);
   return null;
+};
+
+realign = function(alignment, inner, outer) {
+  if (alignment === 'l' || alignment === 't') {
+    return 0;
+  } else if (alignment === 'c' || alignment === 'm') {
+    return outer / 2 - inner / 2;
+  } else if (alignment === 'r' || alignment === 'b') {
+    return outer - inner;
+  }
+  throw "Invalid alignment";
 };
 
 insertCSS = function(style) {
@@ -226,82 +237,88 @@ Notification = (function() {
     } else if (!hidden && !show) {
       fn = this.options.hideAnimation;
       args.push(this.options.hideDuration);
+    } else {
+      return callback();
     }
     args.push(callback);
     return elems[fn].apply(elems, args);
   };
 
   Notification.prototype.updatePosition = function() {
-    var elementPosition, p, position, wrapperPosition;
+    var arrowCss, color, contH, contW, css, elemH, elemPos, elemW, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, padding, pos, posFull, position, size, wrapPos, _i, _len;
     if (!this.elem) {
       return;
     }
-    elementPosition = this.elem.position();
-    wrapperPosition = this.wrapper.position();
+    elemPos = this.elem.position();
+    elemH = this.elem.outerHeight();
+    elemW = this.elem.outerWidth();
+    wrapPos = this.wrapper.position();
+    contH = this.container.height();
+    contW = this.container.width();
     position = this.getPosition();
-    console.log(this.elem[0]);
-    console.log("update position", position, " elem ", elementPosition, " main ", wrapperPosition);
-    p = {};
-    switch (position[0]) {
-      case 'b':
-        incr(p, 'top', this.elem.outerHeight());
-        break;
-      case 't':
-        incr(p, 'bottom', 0);
-        break;
-      case 'l':
-        incr(p, 'right', 0);
-        break;
-      case 'r':
-        incr(p, 'left', this.elem.outerWidth());
-        break;
-      default:
-        throw "Unknown position: " + position;
+    console.log(position);
+    pMain = position[0];
+    pAlign = position[1];
+    pArrow = position[2] || pAlign;
+    mainFull = positions[pMain];
+    opp = opposites[pMain];
+    oppFull = positions[opp];
+    css = {};
+    css[oppFull] = pMain === 'b' ? elemH : pMain === 'r' ? elemW : 0;
+    incr(css, 'left', elemPos.left - wrapPos.left);
+    margin = parseInt(this.elem.css("margin-left"), 10);
+    if (margin) {
+      incr(css, 'left', margin);
     }
-    if (!navigator.userAgent.match(/MSIE/)) {
-      incr(p, 'top', elementPosition.top - wrapperPosition.top);
-    }
-    incr(p, 'left', elementPosition.left - wrapperPosition.left);
-    return this.container.css(p);
-  };
-
-  Notification.prototype.updateArrow = function(p, position) {
-    var d, dir, size;
-    if (!(this.options.arrowShow && this.elementType !== 'radio')) {
-      this.arrow.hide();
-      return;
-    }
-    dir = arrowDirs[position];
-    size = this.options.arrowSize;
-    this.arrow.css('border-' + position, size + 'px solid ' + this.getColor());
-    this.arrow.css(p);
-    for (d in arrowDirs) {
-      if (d !== dir && d !== position) {
-        this.arrow.css('border-' + d, size + 'px solid transparent');
+    if (/^inline/.test(this.elem.css('display'))) {
+      padding = parseInt(this.elem.css("padding-top"), 10);
+      if (padding) {
+        incr(css, 'top', -padding);
       }
     }
-    switch (position) {
-      case 'bottom':
-        p.top += size;
-        break;
-      case 'right':
-        p.left += size;
+    incr(css, 'top', this.options.offsetY);
+    incr(css, 'left', this.options.offsetX);
+    if (!this.options.arrowShow) {
+      this.arrow.hide();
+    } else {
+      size = this.options.arrowSize;
+      arrowCss = $.extend({}, css);
+      for (_i = 0, _len = mainPositions.length; _i < _len; _i++) {
+        pos = mainPositions[_i];
+        posFull = positions[pos];
+        if (pos === opp) {
+          continue;
+        }
+        color = posFull === mainFull ? this.getColor() : 'transparent';
+        arrowCss["border-" + posFull] = "" + size + "px solid " + color;
+      }
+      incr(css, positions[opp], size);
+      this.arrow.css(arrowCss).show();
     }
-    return this.arrow.show();
+    if (__indexOf.call(vPositions, pMain) >= 0) {
+      incr(css, 'left', realign(pAlign, contW, elemW));
+    }
+    if (__indexOf.call(hPositions, pMain) >= 0) {
+      incr(css, 'top', realign(pAlign, contH, elemH));
+    }
+    if (this.container.is(":visible")) {
+      css.display = 'block';
+    }
+    return this.container.removeAttr('style').css(css);
   };
 
   Notification.prototype.getPosition = function() {
-    var pos, text;
+    var pos, text, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
     text = this.options.position;
     pos = parsePosition(text);
     if (pos.length === 0) {
-      pos.push('b');
+      pos[0] = 'b';
     }
-    if (pos.length === 1 && pos[0] === 'l' || pos[0] === 'r') {
-      pos.push('m');
+    if (_ref = pos[0], __indexOf.call(mainPositions, _ref) < 0) {
+      throw "Must be one of [" + mainPositions + "]";
     }
-    if (pos.length === 1) {
-      pos.push('l');
+    if (pos.length === 1 || ((_ref1 = pos[0], __indexOf.call(vPositions, _ref1) >= 0) && (_ref2 = pos[1], __indexOf.call(hPositions, _ref2) < 0)) || ((_ref3 = pos[0], __indexOf.call(hPositions, _ref3) >= 0) && (_ref4 = pos[1], __indexOf.call(vPositions, _ref4) < 0))) {
+      pos[1] = (_ref5 = pos[0], __indexOf.call(hPositions, _ref5) >= 0) ? 'm' : 'l';
     }
     if (!this.options.autoReposition) {
       return pos;
@@ -338,8 +355,7 @@ Notification = (function() {
   };
 
   Notification.prototype.run = function(data, options) {
-    var autohideTimer,
-      _this = this;
+    var _this = this;
     if ($.isPlainObject(options)) {
       $.extend(this.options, options);
     } else if ($.type(options) === 'string') {
@@ -360,7 +376,7 @@ Notification = (function() {
     this.show(true);
     if (this.options.autoHide) {
       clearTimeout(this.autohideTimer);
-      return autohideTimer = setTimeout(function() {
+      return this.autohideTimer = setTimeout(function() {
         return _this.show(false);
       }, this.options.autoHideDelay);
     }

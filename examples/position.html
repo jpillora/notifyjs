@@ -10,9 +10,9 @@
       margin: 150px;
     }
     .box {
-      padding: 10px;
-      margin: 10px;
       border: thin solid blue;
+      padding: 10px;
+      margin: 20px;
       width: 100px;
     }
     .wrapper {
@@ -33,7 +33,7 @@
       boxes.append($("<div class=\"wrapper\"/>").append(box));
 
       setTimeout(function() {
-        box.notify(p, {position: p});
+        box.notify(p, {position: p+" middle"});
       }, 500)
     });
   </script>

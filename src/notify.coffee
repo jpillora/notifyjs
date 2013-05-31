@@ -13,6 +13,9 @@ positions =
   l: 'left'
   c: 'center'
   r: 'right'
+hPositions = ['l','c','r']
+vPositions = ['t','m','b']
+mainPositions = ['t','b','l','r']
 #positions mapped to opposites
 opposites =
   t: 'b'
@@ -34,6 +37,7 @@ styles =
   core:
     html: """
       <div class="#{className}Wrapper">
+        <div class="#{className}Debug"></div>
         <div class="#{className}Arrow"></div>
         <div class="#{className}Container"></div>
       </div>
@@ -61,7 +65,13 @@ styles =
         display: inline-block;
         height: 0;
         width: 0;
-        border: thin solid red;
+      }
+
+      .#{className}Debug {
+        position: absolute;
+        border: 3px solid red;
+        height: 0;
+        width: 0;
       }
 
       .#{className}Container {
@@ -76,10 +86,8 @@ styles =
       }
 
       .#{className}Arrow {
-        margin-top: 2px;
         position: absolute;
         z-index: 2;
-        margin-left: 10px;
         width: 0;
         height: 0;
       }
@@ -136,7 +144,7 @@ styles =
 pluginOptions =
   autoHide: false
   autoHideDelay: 2000
-  arrowShow: false
+  arrowShow: true
   arrowSize: 5
   position: 'bottom'
   # Default style
@@ -154,7 +162,7 @@ pluginOptions =
   hideAnimation: 'slideUp'
   hideDuration: 200
   # Gap between main and element
-  offsetY: 2
+  offsetY: 0
   offsetX: 0
   #TODO add z-index watches
   #parents:  { '.ui-dialog': 5001 }
@@ -180,10 +188,8 @@ getAnchorElement = (element) ->
   #custom-styled inputs - find thier real element
   element
 
-incr = (obj, pos, val, useOpposite = true) ->
-
+incr = (obj, pos, val) ->
   # console.log "incr ---- #{pos} #{val} (#{typeof val})"
-
   if typeof val is 'string'
     val = parseInt val, 10
   else if typeof val isnt 'number'
@@ -196,7 +202,6 @@ incr = (obj, pos, val, useOpposite = true) ->
 
   #use the opposite if exists
   if obj[opp] isnt `undefined`
-    return unless useOpposite
     pos = positions[opp.charAt(0)]
     val *= -1
 
@@ -204,9 +209,16 @@ incr = (obj, pos, val, useOpposite = true) ->
     obj[pos] = val
   else
     obj[pos] += val
-
-  console.log "incr (#{opp}>>#{temp}) #{pos} by #{val}"
   null
+
+realign = (alignment, inner, outer) ->
+  return if alignment in ['l','t']
+    0
+  else if alignment in ['c','m']
+    outer/2 - inner/2
+  else if alignment in ['r','b']
+    outer - inner
+  throw "Invalid alignment"
 
 insertCSS = (style) ->
   return unless style and style.css
@@ -287,6 +299,8 @@ class Notification
     else if not hidden and not show
       fn = @options.hideAnimation
       args.push @options.hideDuration
+    else
+      return callback()
 
     args.push callback
 
@@ -294,83 +308,88 @@ class Notification
 
   updatePosition: ->
     return unless @elem
-    #
-    elementPosition = @elem.position()
-    wrapperPosition = @wrapper.position()
 
-    #
+    #grab some dimensions
+    elemPos = @elem.position()
+    elemH = @elem.outerHeight()
+    elemW = @elem.outerWidth()
+    wrapPos = @wrapper.position()
+    contH = @container.height()
+    contW = @container.width()
+
+    #get user defined position
     position = @getPosition()
-
-    console.log @elem[0]
-    console.log "update position", position, " elem ", elementPosition, " main ", wrapperPosition
+    console.log position
+    pMain  = position[0]
+    pAlign = position[1]
+    pArrow = position[2] or pAlign
 
     #start calculations
-    p = {}
-    switch position[0]
-      when 'b'
-        incr p, 'top', @elem.outerHeight()
-      when 't'
-        incr p, 'bottom', 0
-      when 'l'
-        incr p, 'right', 0
-      when 'r'
-        incr p, 'left', @elem.outerWidth()
-      else
-        throw "Unknown position: #{position}"
+    mainFull = positions[pMain]
+    opp = opposites[pMain]
+    oppFull = positions[opp]
+    #initial positioning
+    css = {}
+    css[oppFull] = if pMain is 'b' then elemH else
+                   if pMain is 'r' then elemW else 0
 
-    #elem vs wrapper corrections
-    unless navigator.userAgent.match /MSIE/
-      incr p, 'top', (elementPosition.top - wrapperPosition.top)
+    #correct for elem-wrapper offset
+    # unless navigator.userAgent.match /MSIE/
+    #   incr css, 'top', (elemPos.top - wrapPos.top)
+    incr css, 'left', elemPos.left - wrapPos.left
     
-    incr p, 'left', elementPosition.left - wrapperPosition.left
-    
-    # console.log "corrent margin"
-    # for pos in ['top','right','bottom','left']
-    #   incr p, pos, @elem.css("margin-#{pos}"), false
+    #correct for left margin
+    margin = parseInt @elem.css("margin-left"), 10
+    incr css, 'left', margin if margin
+    #correct for inline top padding
+    if /^inline/.test @elem.css('display')
+      padding = parseInt @elem.css("padding-top"), 10
+      incr css, 'top', -padding if padding
+    #user defined offset
+    incr css, 'top', @options.offsetY
+    incr css, 'left', @options.offsetX
 
-    #set user offset
-    # p.top += @options.offsetY
-    # p.left += @options.offsetX
-
-    # @updateArrow p, position
-
-    # if @setCSS
-    #   @container.stop().animate(p)
-    # else
-    @container.css p
-    # @setCSS = true
-
-  updateArrow: (p, position) ->
-
-    unless @options.arrowShow and @elementType isnt 'radio'
+    #calculate arrow
+    if not @options.arrowShow
       @arrow.hide()
-      return 
+    else
+      size = @options.arrowSize
+      arrowCss = $.extend {}, css
+      #build arrow
+      for pos in mainPositions
+        posFull = positions[pos]
+        continue if pos is opp
+        color = if posFull is mainFull then @getColor() else 'transparent'
+        arrowCss["border-#{posFull}"] = "#{size}px solid #{color}"
+      #add some room for the arrow
+      incr css, positions[opp], size
+      #add styles
+      @arrow.css(arrowCss).show()
 
-    dir = arrowDirs[position]
-    size = @options.arrowSize
+    #calculate alignment
+    if pMain in vPositions
+      incr css, 'left', realign(pAlign, contW, elemW)
+    if pMain in hPositions
+      incr css, 'top', realign(pAlign, contH, elemH)
 
-    @arrow.css 'border-' + position, size + 'px solid ' + @getColor()
-    @arrow.css p
-    for d of arrowDirs
-      if d isnt dir and d isnt position
-        @arrow.css 'border-' + d, size + 'px solid transparent'  
-
-    switch position
-      when 'bottom'
-        p.top += size
-      when 'right'
-        p.left += size
-
-    @arrow.show()
+    #apply css
+    css.display = 'block' if @container.is(":visible")
+    @container.removeAttr('style').css css
 
   getPosition: ->
     text = @options.position
     pos = parsePosition text
 
     #if unspecified - choose bottom left
-    pos.push 'b' if pos.length is 0
-    pos.push 'm' if pos.length is 1 and pos[0] is 'l' or pos[0] is 'r'
-    pos.push 'l' if pos.length is 1
+    pos[0] = 'b' if pos.length is 0
+
+    if pos[0] not in mainPositions
+      throw "Must be one of [#{mainPositions}]"
+ 
+    if pos.length is 1 or
+       (pos[0] in vPositions and pos[1] not in hPositions) or
+       (pos[0] in hPositions and pos[1] not in vPositions)
+      pos[1] = if pos[0] in hPositions then 'm' else 'l'
 
     unless @options.autoReposition
       return pos
@@ -431,7 +450,7 @@ class Notification
     #autohide
     if @options.autoHide
       clearTimeout @autohideTimer
-      autohideTimer = setTimeout =>
+      @autohideTimer = setTimeout =>
         @show false
       , @options.autoHideDelay
 
