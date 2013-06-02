@@ -6,7 +6,7 @@ pluginName = 'notify'
 className = '__'+pluginName
 
 
-positions = 
+positions =
   t: 'top'
   m: 'middle'
   b: 'bottom'
@@ -96,34 +96,28 @@ styles =
 
     """
   user:
-    default:
+    bootstrap:
       html: """
-        <div class="#{className}Default" 
-             data-notify-style="
-              color: {{color}}; 
-              border-color: {{color}};
-             ">
+        <div>
            <span data-notify-text></span>
          </div>
       """
-      css: """
-        .#{className}Default {
-          background: #fff;
-          font-size: 11px;
-          box-shadow: 0 0 6px #000;
-          -moz-box-shadow: 0 0 6px #000;
-          -webkit-box-shadow: 0 0 6px #000;
-          padding: 4px 10px 4px 8px;
-          border-radius: 6px;
-          border-style: solid;
-          border-width: 2px;
-          -moz-border-radius: 6px;
-          -webkit-border-radius: 6px;
-          white-space: nowrap;
-        }
-      """
+      classes:
+        base: """
+          padding: 8px 35px 8px 14px;
+          margin-bottom: 20px;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+          background-color: #fcf8e3;
+          border: 1px solid #fbeed5;
+          -webkit-border-radius: 4px;
+          -moz-border-radius: 4px;
+          border-radius: 4px;
+          """
+        error:
+        info:
+        warn:
 
-    bootstrap: 
+    bootstrap:
       html: """
         <div class="alert alert-error #{className}Bootstrap">
           <strong data-notify-text></strong>
@@ -199,7 +193,7 @@ incr = (obj, pos, val) ->
 
   return if isNaN val
 
-  opp = positions[opposites[pos.charAt(0)]]  
+  opp = positions[opposites[pos.charAt(0)]]
   temp = pos
 
   #use the opposite if exists
@@ -230,14 +224,14 @@ insertCSS = (style) ->
   $("head").append elem
   style.cssElem = elem
 
-  try 
+  try
     elem.html style.css
   catch e #ie fix
     elem[0].styleSheet.cssText = style.css
 
 #define plugin
 class Notification
-  
+
   #setup instance variables
   constructor: (elem, data, options) ->
     options = {color: options} if typeof options is 'string'
@@ -287,7 +281,7 @@ class Notification
   show: (show, callback = $.noop) ->
 
     hidden = @container.parent().parents(':hidden').length > 0
-    
+
     elems = @container.add @arrow
     args = []
 
@@ -306,7 +300,7 @@ class Notification
 
     args.push callback
 
-    elems[fn].apply elems, args 
+    elems[fn].apply elems, args
 
   updatePosition: ->
     return unless @elem
@@ -341,7 +335,7 @@ class Notification
     # unless navigator.userAgent.match /MSIE/
     #   incr css, 'top', (elemPos.top - wrapPos.top)
     incr css, 'left', elemPos.left - wrapPos.left
-    
+
     #correct for left margin
     margin = parseInt @elem.css("margin-left"), 10
     incr css, 'left', margin if margin
@@ -391,7 +385,7 @@ class Notification
     pos[0] = 'b' if pos.length is 0
     if pos[0] not in mainPositions
       throw "Must be one of [#{mainPositions}]"
-    
+      
     #validate alignment
     if pos.length is 1 or
        (pos[0] in vAligns and pos[1] not in hAligns) or
@@ -410,7 +404,7 @@ class Notification
     styleColors = @getStyle().colors
     return (styleColors and
             styleColors[@options.color]) or
-           @options.colors[@options.color] or 
+           @options.colors[@options.color] or
            @options.color
 
   getStyle: (name) ->
@@ -432,7 +426,7 @@ class Notification
   run: (data, options) ->
     #update options
     if $.isPlainObject(options)
-      $.extend @options, options 
+      $.extend @options, options
     #shortcut special case
     else if $.type(options) is 'string'
       @options.color = options
