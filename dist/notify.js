@@ -1,11 +1,11 @@
-/** Notify.js - v0.0.1 - 2013/05/31
+/** Notify.js - v0.0.1 - 2013/06/03
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, className, cornerElem, createElem, getAnchorElement, hPositions, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginName, pluginOptions, positions, realign, styles, vPositions,
+var Notification, className, cornerElem, createElem, getAnchorElement, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginName, pluginOptions, positions, realign, styles, vAligns,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 pluginName = 'notify';
@@ -21,9 +21,9 @@ positions = {
   r: 'right'
 };
 
-hPositions = ['l', 'c', 'r'];
+hAligns = ['l', 'c', 'r'];
 
-vPositions = ['t', 'm', 'b'];
+vAligns = ['t', 'm', 'b'];
 
 mainPositions = ['t', 'b', 'l', 'r'];
 
@@ -51,8 +51,8 @@ parsePosition = function(str) {
 
 styles = {
   core: {
-    html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Debug\"></div>\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
-    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Debug {\n  position: absolute;\n  border: 3px solid red;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}\n"
+    html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
+    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}\n"
   },
   user: {
     "default": {
@@ -76,7 +76,7 @@ pluginOptions = {
   arrowSize: 5,
   position: 'bottom',
   style: 'default',
-  color: 'red',
+  color: 'black',
   colors: {
     red: '#b94a48',
     green: '#33be40',
@@ -245,18 +245,19 @@ Notification = (function() {
   };
 
   Notification.prototype.updatePosition = function() {
-    var arrowCss, color, contH, contW, css, elemH, elemPos, elemW, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, padding, pos, posFull, position, size, wrapPos, _i, _len;
+    var arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, padding, pos, posFull, position, wrapPos, _i, _len;
     if (!this.elem) {
       return;
     }
     elemPos = this.elem.position();
     elemH = this.elem.outerHeight();
     elemW = this.elem.outerWidth();
+    elemIH = this.elem.innerHeight();
+    elemIW = this.elem.innerWidth();
     wrapPos = this.wrapper.position();
     contH = this.container.height();
     contW = this.container.width();
     position = this.getPosition();
-    console.log(position);
     pMain = position[0];
     pAlign = position[1];
     pArrow = position[2] || pAlign;
@@ -281,7 +282,7 @@ Notification = (function() {
     if (!this.options.arrowShow) {
       this.arrow.hide();
     } else {
-      size = this.options.arrowSize;
+      arrowSize = this.options.arrowSize;
       arrowCss = $.extend({}, css);
       for (_i = 0, _len = mainPositions.length; _i < _len; _i++) {
         pos = mainPositions[_i];
@@ -290,21 +291,31 @@ Notification = (function() {
           continue;
         }
         color = posFull === mainFull ? this.getColor() : 'transparent';
-        arrowCss["border-" + posFull] = "" + size + "px solid " + color;
+        arrowCss["border-" + posFull] = "" + arrowSize + "px solid " + color;
       }
-      incr(css, positions[opp], size);
-      this.arrow.css(arrowCss).show();
+      incr(css, positions[opp], arrowSize);
+      if (__indexOf.call(mainPositions, pAlign) >= 0) {
+        incr(arrowCss, positions[pAlign], arrowSize * 2);
+      }
     }
-    if (__indexOf.call(vPositions, pMain) >= 0) {
+    if (__indexOf.call(vAligns, pMain) >= 0) {
       incr(css, 'left', realign(pAlign, contW, elemW));
-    }
-    if (__indexOf.call(hPositions, pMain) >= 0) {
+      if (arrowCss) {
+        incr(arrowCss, 'left', realign(pAlign, arrowSize, elemIW));
+      }
+    } else if (__indexOf.call(hAligns, pMain) >= 0) {
       incr(css, 'top', realign(pAlign, contH, elemH));
+      if (arrowCss) {
+        incr(arrowCss, 'top', realign(pAlign, arrowSize, elemIH));
+      }
     }
     if (this.container.is(":visible")) {
       css.display = 'block';
     }
-    return this.container.removeAttr('style').css(css);
+    this.container.removeAttr('style').css(css);
+    if (arrowCss) {
+      return this.arrow.removeAttr('style').css(arrowCss);
+    }
   };
 
   Notification.prototype.getPosition = function() {
@@ -317,8 +328,8 @@ Notification = (function() {
     if (_ref = pos[0], __indexOf.call(mainPositions, _ref) < 0) {
       throw "Must be one of [" + mainPositions + "]";
     }
-    if (pos.length === 1 || ((_ref1 = pos[0], __indexOf.call(vPositions, _ref1) >= 0) && (_ref2 = pos[1], __indexOf.call(hPositions, _ref2) < 0)) || ((_ref3 = pos[0], __indexOf.call(hPositions, _ref3) >= 0) && (_ref4 = pos[1], __indexOf.call(vPositions, _ref4) < 0))) {
-      pos[1] = (_ref5 = pos[0], __indexOf.call(hPositions, _ref5) >= 0) ? 'm' : 'l';
+    if (pos.length === 1 || ((_ref1 = pos[0], __indexOf.call(vAligns, _ref1) >= 0) && (_ref2 = pos[1], __indexOf.call(hAligns, _ref2) < 0)) || ((_ref3 = pos[0], __indexOf.call(hAligns, _ref3) >= 0) && (_ref4 = pos[1], __indexOf.call(vAligns, _ref4) < 0))) {
+      pos[1] = (_ref5 = pos[0], __indexOf.call(hAligns, _ref5) >= 0) ? 'm' : 'l';
     }
     if (!this.options.autoReposition) {
       return pos;

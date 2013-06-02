@@ -13,8 +13,8 @@ positions =
   l: 'left'
   c: 'center'
   r: 'right'
-hPositions = ['l','c','r']
-vPositions = ['t','m','b']
+hAligns = ['l','c','r']
+vAligns = ['t','m','b']
 mainPositions = ['t','b','l','r']
 #positions mapped to opposites
 opposites =
@@ -37,11 +37,20 @@ styles =
   core:
     html: """
       <div class="#{className}Wrapper">
-        <div class="#{className}Debug"></div>
         <div class="#{className}Arrow"></div>
         <div class="#{className}Container"></div>
       </div>
     """
+
+      # <div class="#{className}Debug"></div>
+
+      # .#{className}Debug {
+      #   position: absolute;
+      #   border: 3px solid red;
+      #   height: 0;
+      #   width: 0;
+      # }
+
     css: """
       .#{className}Corner {
         position: fixed;
@@ -63,13 +72,6 @@ styles =
         z-index: 1;
         position: absolute;
         display: inline-block;
-        height: 0;
-        width: 0;
-      }
-
-      .#{className}Debug {
-        position: absolute;
-        border: 3px solid red;
         height: 0;
         width: 0;
       }
@@ -150,7 +152,7 @@ pluginOptions =
   # Default style
   style: 'default'
   # Default color
-  color: 'red'
+  color: 'black'
   # Color mappings
   colors:
     red: '#b94a48'
@@ -313,13 +315,15 @@ class Notification
     elemPos = @elem.position()
     elemH = @elem.outerHeight()
     elemW = @elem.outerWidth()
+    elemIH = @elem.innerHeight()
+    elemIW = @elem.innerWidth()
     wrapPos = @wrapper.position()
     contH = @container.height()
     contW = @container.width()
 
     #get user defined position
     position = @getPosition()
-    console.log position
+    
     pMain  = position[0]
     pAlign = position[1]
     pArrow = position[2] or pAlign
@@ -353,43 +357,46 @@ class Notification
     if not @options.arrowShow
       @arrow.hide()
     else
-      size = @options.arrowSize
+      arrowSize = @options.arrowSize
       arrowCss = $.extend {}, css
       #build arrow
       for pos in mainPositions
         posFull = positions[pos]
         continue if pos is opp
         color = if posFull is mainFull then @getColor() else 'transparent'
-        arrowCss["border-#{posFull}"] = "#{size}px solid #{color}"
+        arrowCss["border-#{posFull}"] = "#{arrowSize}px solid #{color}"
       #add some room for the arrow
-      incr css, positions[opp], size
-      #add styles
-      @arrow.css(arrowCss).show()
+      incr css, positions[opp], arrowSize
 
-    #calculate alignment
-    if pMain in vPositions
+      incr arrowCss, positions[pAlign], arrowSize*2 if pAlign in mainPositions
+
+    #calculate container alignment
+    if pMain in vAligns
       incr css, 'left', realign(pAlign, contW, elemW)
-    if pMain in hPositions
+      incr arrowCss, 'left', realign(pAlign, arrowSize, elemIW) if arrowCss
+    else if pMain in hAligns
       incr css, 'top', realign(pAlign, contH, elemH)
+      incr arrowCss, 'top', realign(pAlign, arrowSize, elemIH) if arrowCss
 
     #apply css
     css.display = 'block' if @container.is(":visible")
     @container.removeAttr('style').css css
+    @arrow.removeAttr('style').css(arrowCss) if arrowCss
 
   getPosition: ->
     text = @options.position
     pos = parsePosition text
 
-    #if unspecified - choose bottom left
+    #validate position
     pos[0] = 'b' if pos.length is 0
-
     if pos[0] not in mainPositions
       throw "Must be one of [#{mainPositions}]"
- 
+    
+    #validate alignment
     if pos.length is 1 or
-       (pos[0] in vPositions and pos[1] not in hPositions) or
-       (pos[0] in hPositions and pos[1] not in vPositions)
-      pos[1] = if pos[0] in hPositions then 'm' else 'l'
+       (pos[0] in vAligns and pos[1] not in hAligns) or
+       (pos[0] in hAligns and pos[1] not in vAligns)
+      pos[1] = if pos[0] in hAligns then 'm' else 'l'
 
     unless @options.autoReposition
       return pos
@@ -397,7 +404,6 @@ class Notification
     # if @elem.position().left + @elem.width() + @wrapper.width() < $(window).width()
     #   return 'right'
     # return 'bottom'
-
     throw "Not implemented"
 
   getColor: ->
