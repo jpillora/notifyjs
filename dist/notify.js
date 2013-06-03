@@ -5,12 +5,12 @@
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, className, cornerElem, createElem, getAnchorElement, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginName, pluginOptions, positions, realign, styles, vAligns,
+var Notification, addStyle, className, coreStyle, cornerElem, createElem, defaultStyle, defaultStyleName, getAnchorElement, hAligns, incr, inherit, insertCSS, mainPositions, opposites, options, parsePosition, pluginName, pluginOptions, positions, realign, styles, vAligns,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 pluginName = 'notify';
 
-className = '__' + pluginName;
+className = pluginName + 'js';
 
 positions = {
   t: 'top',
@@ -49,24 +49,63 @@ parsePosition = function(str) {
   return pos;
 };
 
-styles = {
-  core: {
-    html: "<div class=\"" + className + "Wrapper\">\n  <div class=\"" + className + "Arrow\"></div>\n  <div class=\"" + className + "Container\"></div>\n</div>",
-    css: "." + className + "Corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "Corner ." + className + "Wrapper,\n." + className + "Corner ." + className + "Container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "Wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "Container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "Text {\n  position: relative;\n}\n\n." + className + "Arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}\n"
-  },
-  user: {
-    "default": {
-      html: "<div class=\"" + className + "Default\" \n     data-notify-style=\"\n      color: {{color}}; \n      border-color: {{color}};\n     \">\n   <span data-notify-text></span>\n </div>",
-      css: "." + className + "Default {\n  background: #fff;\n  font-size: 11px;\n  box-shadow: 0 0 6px #000;\n  -moz-box-shadow: 0 0 6px #000;\n  -webkit-box-shadow: 0 0 6px #000;\n  padding: 4px 10px 4px 8px;\n  border-radius: 6px;\n  border-style: solid;\n  border-width: 2px;\n  -moz-border-radius: 6px;\n  -webkit-border-radius: 6px;\n  white-space: nowrap;\n}"
-    },
-    bootstrap: {
-      html: "<div class=\"alert alert-error " + className + "Bootstrap\">\n  <strong data-notify-text></strong>\n</div>",
-      css: "." + className + "Bootstrap {\n  white-space: nowrap;\n  margin: 5px !important;\n  padding-left: 25px !important;\n  background-repeat: no-repeat;\n  background-position: 3px 7px;\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtRJREFUeNqkVc1u00AQHq+dOD+0poIQfkIjalW0SEGqRMuRnHos3DjwAH0ArlyQeANOOSMeAA5VjyBxKBQhgSpVUKKQNGloFdw4cWw2jtfMOna6JOUArDTazXi/b3dm55socPqQhFka++aHBsI8GsopRJERNFlY88FCEk9Yiwf8RhgRyaHFQpPHCDmZG5oX2ui2yilkcTT1AcDsbYC1NMAyOi7zTX2Agx7A9luAl88BauiiQ/cJaZQfIpAlngDcvZZMrl8vFPK5+XktrWlx3/ehZ5r9+t6e+WVnp1pxnNIjgBe4/6dAysQc8dsmHwPcW9C0h3fW1hans1ltwJhy0GxK7XZbUlMp5Ww2eyan6+ft/f2FAqXGK4CvQk5HueFz7D6GOZtIrK+srupdx1GRBBqNBtzc2AiMr7nPplRdKhb1q6q6zjFhrklEFOUutoQ50xcX86ZlqaZpQrfbBdu2R6/G19zX6XSgh6RX5ubyHCM8nqSID6ICrGiZjGYYxojEsiw4PDwMSL5VKsC8Yf4VRYFzMzMaxwjlJSlCyAQ9l0CW44PBADzXhe7xMdi9HtTrdYjFYkDQL0cn4Xdq2/EAE+InCnvADTf2eah4Sx9vExQjkqXT6aAERICMewd/UAp/IeYANM2joxt+q5VI+ieq2i0Wg3l6DNzHwTERPgo1ko7XBXj3vdlsT2F+UuhIhYkp7u7CarkcrFOCtR3H5JiwbAIeImjT/YQKKBtGjRFCU5IUgFRe7fF4cCNVIPMYo3VKqxwjyNAXNepuopyqnld602qVsfRpEkkz+GFL1wPj6ySXBpJtWVa5xlhpcyhBNwpZHmtX8AGgfIExo0ZpzkWVTBGiXCSEaHh62/PoR0p/vHaczxXGnj4bSo+G78lELU80h1uogBwWLf5YlsPmgDEd4M236xjm+8nm4IuE/9u+/PH2JXZfbwz4zw1WbO+SQPpXfwG/BBgAhCNZiSb/pOQAAAAASUVORK5CYII=);\n}",
-      colors: {
-        red: '#eed3d7'
-      }
-    }
+styles = {};
+
+coreStyle = {
+  name: 'core',
+  html: "<div class=\"" + className + "-wrapper\">\n  <div class=\"" + className + "-arrow\"></div>\n  <div class=\"" + className + "-container\"></div>\n</div>",
+  css: "." + className + "-corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + className + "-corner ." + className + "-wrapper,\n." + className + "-corner ." + className + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + className + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + className + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + className + "-text {\n  position: relative;\n}\n\n." + className + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
+};
+
+defaultStyleName = "bootstrap";
+
+defaultStyle = {
+  html: "<div>\n  <span data-notify-text></span>\n</div>",
+  classes: {
+    base: "padding: 8px 35px 8px 14px;\ntext-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);\nbackground-color: #fcf8e3;\nborder: 1px solid #fbeed5;\n-webkit-border-radius: 4px;\n-moz-border-radius: 4px;\nborder-radius: 4px;\nwhite-space: nowrap;",
+    error: "color: #B94A48;\nbackground-color: #F2DEDE;\nborder-color: #EED3D7;\npadding-left: 25px;\nbackground-repeat: no-repeat;\nbackground-position: 3px 7px;\nbackground-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtRJREFUeNqkVc1u00AQHq+dOD+0poIQfkIjalW0SEGqRMuRnHos3DjwAH0ArlyQeANOOSMeAA5VjyBxKBQhgSpVUKKQNGloFdw4cWw2jtfMOna6JOUArDTazXi/b3dm55socPqQhFka++aHBsI8GsopRJERNFlY88FCEk9Yiwf8RhgRyaHFQpPHCDmZG5oX2ui2yilkcTT1AcDsbYC1NMAyOi7zTX2Agx7A9luAl88BauiiQ/cJaZQfIpAlngDcvZZMrl8vFPK5+XktrWlx3/ehZ5r9+t6e+WVnp1pxnNIjgBe4/6dAysQc8dsmHwPcW9C0h3fW1hans1ltwJhy0GxK7XZbUlMp5Ww2eyan6+ft/f2FAqXGK4CvQk5HueFz7D6GOZtIrK+srupdx1GRBBqNBtzc2AiMr7nPplRdKhb1q6q6zjFhrklEFOUutoQ50xcX86ZlqaZpQrfbBdu2R6/G19zX6XSgh6RX5ubyHCM8nqSID6ICrGiZjGYYxojEsiw4PDwMSL5VKsC8Yf4VRYFzMzMaxwjlJSlCyAQ9l0CW44PBADzXhe7xMdi9HtTrdYjFYkDQL0cn4Xdq2/EAE+InCnvADTf2eah4Sx9vExQjkqXT6aAERICMewd/UAp/IeYANM2joxt+q5VI+ieq2i0Wg3l6DNzHwTERPgo1ko7XBXj3vdlsT2F+UuhIhYkp7u7CarkcrFOCtR3H5JiwbAIeImjT/YQKKBtGjRFCU5IUgFRe7fF4cCNVIPMYo3VKqxwjyNAXNepuopyqnld602qVsfRpEkkz+GFL1wPj6ySXBpJtWVa5xlhpcyhBNwpZHmtX8AGgfIExo0ZpzkWVTBGiXCSEaHh62/PoR0p/vHaczxXGnj4bSo+G78lELU80h1uogBwWLf5YlsPmgDEd4M236xjm+8nm4IuE/9u+/PH2JXZfbwz4zw1WbO+SQPpXfwG/BBgAhCNZiSb/pOQAAAAASUVORK5CYII=);",
+    info: "",
+    warn: ""
   }
+};
+
+addStyle = function(name, def) {
+  var cssText;
+  if (styles[name]) {
+    alert("" + pluginName + ": style '" + name + "' already defined");
+    return;
+  }
+  def.name = name;
+  styles[name] = def;
+  if (def.cssElem) {
+    return;
+  }
+  cssText = "";
+  if (def.classes) {
+    $.each(def.classes, function(subClassName, css) {
+      return cssText += "." + className + "-" + def.name + "-" + subClassName + " {\n  " + css + "\n}\n";
+    });
+  }
+  if (def.css) {
+    cssText += "/* styles for " + def.name + " */\n" + def.css;
+  }
+  if (!cssText) {
+    return;
+  }
+  def.cssElem = insertCSS(cssText);
+  return def.cssElem.attr('data-notify-style', def.name);
+};
+
+insertCSS = function(cssText) {
+  var elem;
+  elem = createElem("style");
+  $("head").append(elem);
+  try {
+    elem.html(cssText);
+  } catch (e) {
+    elem[0].styleSheet.cssText = cssText;
+  }
+  return elem;
 };
 
 pluginOptions = {
@@ -74,25 +113,16 @@ pluginOptions = {
   autoHideDelay: 2000,
   arrowShow: true,
   arrowSize: 5,
+  arrowColor: 'border',
   position: 'bottom',
-  style: 'default',
-  color: 'black',
-  colors: {
-    red: '#b94a48',
-    green: '#33be40',
-    black: '#393939',
-    blue: '#00f'
-  },
+  style: 'bootstrap',
+  cls: 'error',
   showAnimation: 'slideDown',
   showDuration: 400,
   hideAnimation: 'slideUp',
   hideDuration: 200,
   offsetY: 0,
   offsetX: 0
-};
-
-createElem = function(tag) {
-  return $("<" + tag + "></" + tag + ">");
 };
 
 inherit = function(a, b) {
@@ -102,7 +132,15 @@ inherit = function(a, b) {
   return $.extend(true, new F(), b);
 };
 
-cornerElem = createElem("div").addClass("" + className + "Corner");
+options = function(opts) {
+  return $.extend(pluginOptions, opts);
+};
+
+createElem = function(tag) {
+  return $("<" + tag + "></" + tag + ">");
+};
+
+cornerElem = createElem("div").addClass("" + className + "-corner");
 
 getAnchorElement = function(element) {
   var radios;
@@ -150,25 +188,6 @@ realign = function(alignment, inner, outer) {
   throw "Invalid alignment";
 };
 
-insertCSS = function(style) {
-  var elem;
-  if (!(style && style.css)) {
-    return;
-  }
-  elem = style.cssElem;
-  if (elem) {
-    return;
-  }
-  elem = createElem("style");
-  $("head").append(elem);
-  style.cssElem = elem;
-  try {
-    return elem.html(style.css);
-  } catch (e) {
-    return elem[0].styleSheet.cssText = style.css;
-  }
-};
-
 Notification = (function() {
 
   function Notification(elem, data, options) {
@@ -178,12 +197,11 @@ Notification = (function() {
       };
     }
     this.options = inherit(pluginOptions, $.isPlainObject(options) ? options : {});
-    this.loadCSS();
     this.loadHTML();
-    this.wrapper = $(styles.core.html);
+    this.wrapper = $(coreStyle.html);
     this.wrapper.data(className, this);
-    this.arrow = this.wrapper.find("." + className + "Arrow");
-    this.container = this.wrapper.find("." + className + "Container");
+    this.arrow = this.wrapper.find("." + className + "-arrow");
+    this.container = this.wrapper.find("." + className + "-container");
     this.container.append(this.userContainer);
     if (elem && elem.length) {
       this.elementType = elem.attr('type');
@@ -199,15 +217,6 @@ Notification = (function() {
     this.run(data);
   }
 
-  Notification.prototype.loadCSS = function(style) {
-    var name;
-    if (!style) {
-      name = this.options.style;
-      style = this.getStyle(name);
-    }
-    return insertCSS(style);
-  };
-
   Notification.prototype.loadHTML = function() {
     var style;
     style = this.getStyle();
@@ -216,7 +225,7 @@ Notification = (function() {
     if (this.text.length === 0) {
       throw "style: " + name + " HTML is missing the: 'data-notify-text' attribute";
     }
-    return this.text.addClass("" + className + "Text");
+    return this.text.addClass("" + className + "-text");
   };
 
   Notification.prototype.show = function(show, callback) {
@@ -245,7 +254,7 @@ Notification = (function() {
   };
 
   Notification.prototype.updatePosition = function() {
-    var arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, padding, pos, posFull, position, wrapPos, _i, _len;
+    var arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, padding, pos, posFull, position, style, wrapPos, _i, _len;
     if (!this.elem) {
       return;
     }
@@ -258,6 +267,7 @@ Notification = (function() {
     contH = this.container.height();
     contW = this.container.width();
     position = this.getPosition();
+    console.log(position);
     pMain = position[0];
     pAlign = position[1];
     pArrow = position[2] || pAlign;
@@ -279,6 +289,7 @@ Notification = (function() {
     }
     incr(css, 'top', this.options.offsetY);
     incr(css, 'left', this.options.offsetX);
+    style = this.getStyle();
     if (!this.options.arrowShow) {
       this.arrow.hide();
     } else {
@@ -290,7 +301,7 @@ Notification = (function() {
         if (pos === opp) {
           continue;
         }
-        color = posFull === mainFull ? this.getColor() : 'transparent';
+        color = posFull === mainFull ? 'black' : 'transparent';
         arrowCss["border-" + posFull] = "" + arrowSize + "px solid " + color;
       }
       incr(css, positions[opp], arrowSize);
@@ -337,12 +348,6 @@ Notification = (function() {
     throw "Not implemented";
   };
 
-  Notification.prototype.getColor = function() {
-    var styleColors;
-    styleColors = this.getStyle().colors;
-    return (styleColors && styleColors[this.options.color]) || this.options.colors[this.options.color] || this.options.color;
-  };
-
   Notification.prototype.getStyle = function(name) {
     var style;
     if (!name) {
@@ -351,18 +356,26 @@ Notification = (function() {
     if (!name) {
       name = 'default';
     }
-    style = styles.user[name];
+    style = styles[name];
     if (!style) {
       throw "Missing style: " + name;
     }
     return style;
   };
 
-  Notification.prototype.updateStyle = function() {
-    var _this = this;
-    return this.wrapper.find('[data-notify-style]').each(function(i, e) {
-      return $(e).attr('style', $(e).attr('data-notify-style').replace(/\{\{\s*color\s*\}\}/ig, _this.getColor()));
-    });
+  Notification.prototype.updateStyleClasses = function() {
+    var cls, style;
+    cls = ['base'];
+    if ($.isArray(this.options.cls)) {
+      cls = cls.concat(this.options.cls);
+    } else if (this.options.cls) {
+      cls.push(this.options.cls);
+    }
+    style = this.getStyle();
+    cls = $.map(cls, function(n) {
+      return "" + className + "-" + style.name + "-" + n;
+    }).join(' ');
+    return this.userContainer.attr('class', cls);
   };
 
   Notification.prototype.run = function(data, options) {
@@ -383,6 +396,7 @@ Notification = (function() {
     } else {
       this.text.empty().append(data);
     }
+    this.updateStyleClasses();
     this.updatePosition();
     this.show(true);
     if (this.options.autoHide) {
@@ -404,31 +418,6 @@ Notification = (function() {
 
 })();
 
-$(function() {
-  $("body").append(cornerElem);
-  $("link").each(function() {
-    var bootstrapDetected, src;
-    src = $(this).attr('href');
-    if (src.match(/bootstrap/)) {
-      bootstrapDetected = true;
-      return false;
-    }
-  });
-  insertCSS(styles.core);
-  return $(document).on('click', "." + className + "Wrapper", function() {
-    var inst;
-    inst = $(this).data(className);
-    if (!inst) {
-      return;
-    }
-    if (inst.elem) {
-      return inst.show(false);
-    } else {
-      return inst.destroy();
-    }
-  });
-});
-
 $[pluginName] = function(elem, data, options) {
   if ((elem && elem.nodeName) || elem.jquery) {
     $(elem)[pluginName](data, options);
@@ -439,16 +428,6 @@ $[pluginName] = function(elem, data, options) {
   }
   return elem;
 };
-
-$[pluginName].options = function(options) {
-  return $.extend(pluginOptions, options);
-};
-
-$[pluginName].styles = function(s) {
-  return $.extend(true, styles.user, s);
-};
-
-$[pluginName].insertCSS = insertCSS;
 
 $.fn[pluginName] = function(data, options) {
   $(this).each(function() {
@@ -462,5 +441,36 @@ $.fn[pluginName] = function(data, options) {
   });
   return this;
 };
+
+$.extend($[pluginName], {
+  options: options,
+  addStyle: addStyle
+});
+
+$(function() {
+  $("body").append(cornerElem);
+  $("link").each(function() {
+    var bootstrapDetected, src;
+    src = $(this).attr('href');
+    if (src.match(/bootstrap/)) {
+      bootstrapDetected = true;
+      return false;
+    }
+  });
+  insertCSS(coreStyle.css).attr('data-notify-style', 'core');
+  $[pluginName].addStyle(defaultStyleName, defaultStyle);
+  return $(document).on('click', "." + className + "-wrapper", function() {
+    var inst;
+    inst = $(this).data(className);
+    if (!inst) {
+      return;
+    }
+    if (inst.elem) {
+      return inst.show(false);
+    } else {
+      return inst.destroy();
+    }
+  });
+});
 
 }(window,document));
