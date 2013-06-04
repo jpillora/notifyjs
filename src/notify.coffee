@@ -3,7 +3,7 @@
 
 #plugin constants
 pluginName = 'notify'
-className = pluginName+'js'
+pluginClassName = pluginName+'js'
 
 # ================================
 #  POSITIONING
@@ -43,15 +43,15 @@ styles = {}
 coreStyle =
   name: 'core'
   html: """
-    <div class="#{className}-wrapper">
-      <div class="#{className}-arrow"></div>
-      <div class="#{className}-container"></div>
+    <div class="#{pluginClassName}-wrapper">
+      <div class="#{pluginClassName}-arrow"></div>
+      <div class="#{pluginClassName}-container"></div>
     </div>
   """
 
-    # <div class="#{className}Debug"></div>
+    # <div class="#{pluginClassName}Debug"></div>
 
-    # .#{className}Debug {
+    # .#{pluginClassName}Debug {
     #   position: absolute;
     #   border: 3px solid red;
     #   height: 0;
@@ -59,7 +59,7 @@ coreStyle =
     # }
 
   css: """
-    .#{className}-corner {
+    .#{pluginClassName}-corner {
       position: fixed;
       top: 0;
       right: 0;
@@ -67,15 +67,15 @@ coreStyle =
       z-index: 1050;
     }
 
-    .#{className}-corner .#{className}-wrapper,
-    .#{className}-corner .#{className}-container {
+    .#{pluginClassName}-corner .#{pluginClassName}-wrapper,
+    .#{pluginClassName}-corner .#{pluginClassName}-container {
       position: relative;
       display: block;
       height: inherit;
       width: inherit;
     }
 
-    .#{className}-wrapper {
+    .#{pluginClassName}-wrapper {
       z-index: 1;
       position: absolute;
       display: inline-block;
@@ -83,18 +83,18 @@ coreStyle =
       width: 0;
     }
 
-    .#{className}-container {
+    .#{pluginClassName}-container {
       display: none;
       z-index: 1;
       position: absolute;
       cursor: pointer;
     }
 
-    .#{className}-text {
+    .#{pluginClassName}-text {
       position: relative;
     }
 
-    .#{className}-arrow {
+    .#{pluginClassName}-arrow {
       position: absolute;
       z-index: 2;
       width: 0;
@@ -111,27 +111,32 @@ defaultStyle =
   """
 
   classes:
-    base: """
-      padding: 8px 35px 8px 14px;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-      background-color: #fcf8e3;
-      border: 1px solid #fbeed5;
-      -webkit-border-radius: 4px;
-      -moz-border-radius: 4px;
-      border-radius: 4px;
-      white-space: nowrap;
-      """
-    error: """
-      color: #B94A48;
-      background-color: #F2DEDE;
-      border-color: #EED3D7;
-      padding-left: 25px;
-      background-repeat: no-repeat;
-      background-position: 3px 7px;
-      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtRJREFUeNqkVc1u00AQHq+dOD+0poIQfkIjalW0SEGqRMuRnHos3DjwAH0ArlyQeANOOSMeAA5VjyBxKBQhgSpVUKKQNGloFdw4cWw2jtfMOna6JOUArDTazXi/b3dm55socPqQhFka++aHBsI8GsopRJERNFlY88FCEk9Yiwf8RhgRyaHFQpPHCDmZG5oX2ui2yilkcTT1AcDsbYC1NMAyOi7zTX2Agx7A9luAl88BauiiQ/cJaZQfIpAlngDcvZZMrl8vFPK5+XktrWlx3/ehZ5r9+t6e+WVnp1pxnNIjgBe4/6dAysQc8dsmHwPcW9C0h3fW1hans1ltwJhy0GxK7XZbUlMp5Ww2eyan6+ft/f2FAqXGK4CvQk5HueFz7D6GOZtIrK+srupdx1GRBBqNBtzc2AiMr7nPplRdKhb1q6q6zjFhrklEFOUutoQ50xcX86ZlqaZpQrfbBdu2R6/G19zX6XSgh6RX5ubyHCM8nqSID6ICrGiZjGYYxojEsiw4PDwMSL5VKsC8Yf4VRYFzMzMaxwjlJSlCyAQ9l0CW44PBADzXhe7xMdi9HtTrdYjFYkDQL0cn4Xdq2/EAE+InCnvADTf2eah4Sx9vExQjkqXT6aAERICMewd/UAp/IeYANM2joxt+q5VI+ieq2i0Wg3l6DNzHwTERPgo1ko7XBXj3vdlsT2F+UuhIhYkp7u7CarkcrFOCtR3H5JiwbAIeImjT/YQKKBtGjRFCU5IUgFRe7fF4cCNVIPMYo3VKqxwjyNAXNepuopyqnld602qVsfRpEkkz+GFL1wPj6ySXBpJtWVa5xlhpcyhBNwpZHmtX8AGgfIExo0ZpzkWVTBGiXCSEaHh62/PoR0p/vHaczxXGnj4bSo+G78lELU80h1uogBwWLf5YlsPmgDEd4M236xjm+8nm4IuE/9u+/PH2JXZfbwz4zw1WbO+SQPpXfwG/BBgAhCNZiSb/pOQAAAAASUVORK5CYII=);
-      """
-    info: ""
-    warn: ""
+    base:
+      "padding": "8px 15px 8px 14px"
+      "text-shadow": "0 1px 0 rgba(255, 255, 255, 0.5)"
+      "background-color": "#fcf8e3"
+      "border": "1px solid #fbeed5"
+      "border-radius": "4px"
+      "white-space": "nowrap"
+      #for background-image
+      "padding-left": "25px"
+      "background-repeat": "no-repeat"
+      "background-position": "3px 7px"
+    error:
+      "color": "#B94A48"
+      "background-color": "#F2DEDE"
+      "border-color": "#EED3D7"
+      "background-image": "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAtRJREFUeNqkVc1u00AQHq+dOD+0poIQfkIjalW0SEGqRMuRnHos3DjwAH0ArlyQeANOOSMeAA5VjyBxKBQhgSpVUKKQNGloFdw4cWw2jtfMOna6JOUArDTazXi/b3dm55socPqQhFka++aHBsI8GsopRJERNFlY88FCEk9Yiwf8RhgRyaHFQpPHCDmZG5oX2ui2yilkcTT1AcDsbYC1NMAyOi7zTX2Agx7A9luAl88BauiiQ/cJaZQfIpAlngDcvZZMrl8vFPK5+XktrWlx3/ehZ5r9+t6e+WVnp1pxnNIjgBe4/6dAysQc8dsmHwPcW9C0h3fW1hans1ltwJhy0GxK7XZbUlMp5Ww2eyan6+ft/f2FAqXGK4CvQk5HueFz7D6GOZtIrK+srupdx1GRBBqNBtzc2AiMr7nPplRdKhb1q6q6zjFhrklEFOUutoQ50xcX86ZlqaZpQrfbBdu2R6/G19zX6XSgh6RX5ubyHCM8nqSID6ICrGiZjGYYxojEsiw4PDwMSL5VKsC8Yf4VRYFzMzMaxwjlJSlCyAQ9l0CW44PBADzXhe7xMdi9HtTrdYjFYkDQL0cn4Xdq2/EAE+InCnvADTf2eah4Sx9vExQjkqXT6aAERICMewd/UAp/IeYANM2joxt+q5VI+ieq2i0Wg3l6DNzHwTERPgo1ko7XBXj3vdlsT2F+UuhIhYkp7u7CarkcrFOCtR3H5JiwbAIeImjT/YQKKBtGjRFCU5IUgFRe7fF4cCNVIPMYo3VKqxwjyNAXNepuopyqnld602qVsfRpEkkz+GFL1wPj6ySXBpJtWVa5xlhpcyhBNwpZHmtX8AGgfIExo0ZpzkWVTBGiXCSEaHh62/PoR0p/vHaczxXGnj4bSo+G78lELU80h1uogBwWLf5YlsPmgDEd4M236xjm+8nm4IuE/9u+/PH2JXZfbwz4zw1WbO+SQPpXfwG/BBgAhCNZiSb/pOQAAAAASUVORK5CYII=)"
+    success:
+      "color": "#468847"
+      "background-color": "#DFF0D8"
+      "border-color": "#D6E9C6"
+      "background-image": "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAutJREFUeNq0lctPE0Ecx38zu/RFS1EryqtgJFA08YCiMZIAQQ4eRG8eDGdPJiYeTIwHTfwPiAcvXIwXLwoXPaDxkWgQ6islKlJLSQWLUraPLTv7Gme32zoF9KSTfLO7v53vZ3d/M7/fIth+IO6INt2jjoA7bjHCJoAlzCRw59YwHYjBnfMPqAKWQYKjGkfCJqAF0xwZjipQtA3MxeSG87VhOOYegVrUCy7UZM9S6TLIdAamySTclZdYhFhRHloGYg7mgZv1Zzztvgud7V1tbQ2twYA34LJmF4p5dXF1KTufnE+SxeJtuCZNsLDCQU0+RyKTF27Unw101l8e6hns3u0PBalORVVVkcaEKBJDgV3+cGM4tKKmI+ohlIGnygKX00rSBfszz/n2uXv81wd6+rt1orsZCHRdr1Imk2F2Kob3hutSxW8thsd8AXNaln9D7CTfA6O+0UgkMuwVvEFFUbbAcrkcTA8+AtOk8E6KiQiDmMFSDqZItAzEVQviRkdDdaFgPp8HSZKAEAL5Qh7Sq2lIJBJwv2scUqkUnKoZgNhcDKhKg5aH+1IkcouCAdFGAQsuWZYhOjwFHQ96oagWgRoUov1T9kRBEODAwxM2QtEUl+Wp+Ln9VRo6BcMw4ErHRYjH4/B26AlQoQQTRdHWwcd9AH57+UAXddvDD37DmrBBV34WfqiXPl61g+vr6xA9zsGeM9gOdsNXkgpEtTwVvwOklXLKm6+/p5ezwk4B+j6droBs2CsGa/gNs6RIxazl4Tc25mpTgw/apPR1LYlNRFAzgsOxkyXYLIM1V8NMwyAkJSctD1eGVKiq5wWjSPdjmeTkiKvVW4f2YPHWl3GAVq6ymcyCTgovM3FzyRiDe2TaKcEKsLpJvNHjZgPNqEtyi6mZIm4SRFyLMUsONSSdkPeFtY1n0mczoY3BHTLhwPRy9/lzcziCw9ACI+yql0VLzcGAZbYSM5CCSZg1/9oc/nn7+i8N9p/8An4JMADxhH+xHfuiKwAAAABJRU5ErkJggg==)"
+    info: {}
+    warn: {}
+
+stylePrefixes =
+  "border-radius": ["-webkit-", "-moz-"]
 
 addStyle = (name, def) ->
   if styles[name]
@@ -144,12 +149,16 @@ addStyle = (name, def) ->
 
   cssText = ""
   if def.classes
-    $.each def.classes, (subClassName, css) ->
-      cssText += """
-        .#{className}-#{def.name}-#{subClassName} {
-          #{css}
-        }\n
-        """
+    $.each def.classes, (className, props) ->
+      cssText += ".#{pluginClassName}-#{def.name}-#{className} {\n"
+      $.each props, (name, val) ->
+        #vendor prefixes
+        if stylePrefixes[name]
+          $.each stylePrefixes[name], (i, prefix) ->
+            cssText += "  #{prefix}#{name}: #{val};\n"
+        #add prop
+        cssText += "  #{name}: #{val};\n"
+      cssText += "}\n"
   if def.css
     cssText += """
       /* styles for #{def.name} */
@@ -161,6 +170,7 @@ addStyle = (name, def) ->
   def.cssElem.attr('data-notify-style', def.name)
 
 insertCSS = (cssText) ->
+
   elem = createElem("style")
   $("head").append elem
   try
@@ -176,15 +186,14 @@ insertCSS = (cssText) ->
 
 #overridable options
 pluginOptions =
-  autoHide: false
-  autoHideDelay: 2000
+  autoHide: true
+  autoHideDelay: 5000
   arrowShow: true
   arrowSize: 5
-  arrowColor: 'border'
   position: 'bottom'
   # Default style
   style: 'bootstrap'
-  cls: 'error'
+  className: 'error'
   showAnimation: 'slideDown'
   showDuration: 400
   hideAnimation: 'slideUp'
@@ -213,7 +222,7 @@ createElem = (tag) ->
   $ "<#{tag}></#{tag}>"
 
 # container for element-less notifications
-cornerElem = createElem("div").addClass("#{className}-corner")
+cornerElem = createElem("div").addClass("#{pluginClassName}-corner")
 
 #gets first on n radios, and gets the fancy stylised input for hidden inputs
 getAnchorElement = (element) ->
@@ -267,23 +276,23 @@ class Notification
 
   #setup instance variables
   constructor: (elem, data, options) ->
-    options = {color: options} if typeof options is 'string'
+    options = {className: options} if typeof options is 'string'
     @options = inherit pluginOptions, if $.isPlainObject(options) then options else {}
 
     #load user html into @userContainer
     @loadHTML()
 
     @wrapper = $(coreStyle.html)
-    @wrapper.data className, @
-    @arrow = @wrapper.find ".#{className}-arrow"
-    @container = @wrapper.find ".#{className}-container"
+    @wrapper.data pluginClassName, @
+    @arrow = @wrapper.find ".#{pluginClassName}-arrow"
+    @container = @wrapper.find ".#{pluginClassName}-container"
     @container.append @userContainer
 
     if elem and elem.length
       @elementType = elem.attr('type')
       @originalElement = elem
       @elem = getAnchorElement(elem)
-      @elem.data className, @
+      @elem.data pluginClassName, @
       # add into dom above elem
       @elem.before @wrapper
     else
@@ -299,8 +308,12 @@ class Notification
     @userContainer = $(style.html)
     @text = @userContainer.find '[data-notify-text]'
     if @text.length is 0
-      throw "style: #{name} HTML is missing the: 'data-notify-text' attribute"
-    @text.addClass "#{className}-text"
+      @text = @userContainer.find '[data-notify-html]'
+      @rawText = true
+    if @text.length is 0
+      throw "style: '#{name}' HTML is missing a: 'data-notify-text' or 'data-notify-html' attribute"
+
+    @text.addClass "#{pluginClassName}-text"
 
   show: (show, callback = $.noop) ->
 
@@ -341,8 +354,6 @@ class Notification
 
     #get user defined position
     position = @getPosition()
-    
-    console.log position
 
     pMain  = position[0]
     pAlign = position[1]
@@ -354,8 +365,12 @@ class Notification
     oppFull = positions[opp]
     #initial positioning
     css = {}
-    css[oppFull] = if pMain is 'b' then elemH else
-                   if pMain is 'r' then elemW else 0
+    css[oppFull] = if pMain is 'b'
+      elemH
+    else if pMain is 'r'
+      elemW
+    else
+      0
 
     #correct for elem-wrapper offset
     # unless navigator.userAgent.match /MSIE/
@@ -383,11 +398,14 @@ class Notification
     else
       arrowSize = @options.arrowSize
       arrowCss = $.extend {}, css
+      arrowColor = @userContainer.css("border-color") or
+                   @userContainer.css("background-color") or
+                   'white'
       #build arrow
       for pos in mainPositions
         posFull = positions[pos]
         continue if pos is opp
-        color = if posFull is mainFull then 'black' else 'transparent'
+        color = if posFull is mainFull then arrowColor else 'transparent'
         arrowCss["border-#{posFull}"] = "#{arrowSize}px solid #{color}"
       #add some room for the arrow
       incr css, positions[opp], arrowSize
@@ -402,8 +420,8 @@ class Notification
       incr css, 'top', realign(pAlign, contH, elemH)
       incr arrowCss, 'top', realign(pAlign, arrowSize, elemIH) if arrowCss
 
-    #apply css
     css.display = 'block' if @container.is(":visible")
+    #apply css
     @container.removeAttr('style').css css
     @arrow.removeAttr('style').css(arrowCss) if arrowCss
 
@@ -434,21 +452,21 @@ class Notification
     name = @options.style unless name
     name = 'default' unless name
     style = styles[name]
-    throw "Missing style: #{name}" unless style
+    throw "Missing style: #{name}"unless style
     style
 
   updateStyleClasses: ->
-    cls = ['base']
+    classes = ['base']
 
-    if $.isArray @options.cls
-      cls = cls.concat @options.cls
-    else if @options.cls
-      cls.push @options.cls
+    if $.isArray @options.className
+      classes = classes.concat @options.className
+    else if @options.className
+      classes.push @options.className
 
     style = @getStyle()
-    cls = $.map(cls, (n) -> "#{className}-#{style.name}-#{n}").join ' '
+    classes = $.map(classes, (n) -> "#{pluginClassName}-#{style.name}-#{n}").join ' '
 
-    @userContainer.attr 'class', cls
+    @userContainer.attr 'class', classes
       
 
   #run plugin
@@ -509,7 +527,7 @@ $[pluginName] = (elem, data, options) ->
 # $( ... ).pluginName( { .. } ) creates a cached instance on each
 $.fn[pluginName] = (data, options) ->
   $(@).each ->
-    inst = getAnchorElement($(@)).data(className)
+    inst = getAnchorElement($(@)).data(pluginClassName)
     if inst
       inst.run data, options
     else
@@ -537,8 +555,8 @@ $ ->
   $[pluginName].addStyle(defaultStyleName, defaultStyle)
 
   #watch all notifications clicks
-  $(document).on 'click', ".#{className}-wrapper", ->
-    inst = $(@).data className
+  $(document).on 'click', ".#{pluginClassName}-wrapper", ->
+    inst = $(@).data pluginClassName
     return unless inst
     if inst.elem
       inst.show false
