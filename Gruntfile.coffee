@@ -10,21 +10,26 @@ module.exports = (grunt) ->
       "/** <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today(\"yyyy/mm/dd\") %>\n"+
       " * <%= pkg.homepage %>\n" +
       " * Copyright (c) <%= grunt.template.today(\"yyyy\") %> <%= pkg.author.name %> - MIT\n"+
-      " */"
+      " */\n"
 
     coffee:
       options:
         bare: true
       compile:
-        files:
-          'dist/<%= pkg.name %>.js': 'src/<%= pkg.name %>.coffee'
-
+        expand: true,
+        flatten: false,
+        cwd: 'src',
+        src: ['**/*.coffee'],
+        dest: 'dist/',
+        ext: '.js'
     wrap: 
       dist: 
-        src: ['dist/<%= pkg.name %>.js']
+        src: 'dist/<%= pkg.name %>.js'
         dest: '.'
-        wrapper: ["<%= banner %>\n(function(window,document,undefined) {\n","\n}(window,document));"]
-
+        wrapper: [
+          "<%= banner %>(function(window,document,undefined) {\n"
+          "\n}(window,document));"
+        ]
     uglify:
       options: 
         stripBanners: true
@@ -36,7 +41,7 @@ module.exports = (grunt) ->
 
     watch:
       scripts:
-        files: 'src/*.coffee'
+        files: 'src/**/*.coffee'
         tasks: 'default'
 
   grunt.loadNpmTasks "grunt-contrib-watch"

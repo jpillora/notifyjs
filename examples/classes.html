@@ -25,15 +25,19 @@
   <!-- run code -->
   <script class="demo">
 
-    var positions = ["top", "right", "bottom", "left"];
+    $.notify.options({
+      autoHide: false
+    });
+
+    var classes = ["error", "success", "warn", "info"];
     var boxes = $(".boxes");
 
-    $.each(positions, function(i, p) {
-      var box = $("<div class=\"box\">"+p+"</div>");
+    $.each(classes, function(i, c) {
+      var box = $("<div class=\"box\">"+c+"</div>");
       boxes.append($("<div class=\"wrapper\"/>").append(box));
 
       setTimeout(function() {
-        box.notify(p, {position: p+" center"});
+        box.notify(c, {className: c});
       }, 500)
     });
   </script>
