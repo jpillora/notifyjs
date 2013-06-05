@@ -22,6 +22,7 @@ module.exports = (grunt) ->
         src: ['**/*.coffee'],
         dest: 'dist/',
         ext: '.js'
+
     wrap: 
       dist: 
         src: 'dist/<%= pkg.name %>.js'
@@ -30,6 +31,12 @@ module.exports = (grunt) ->
           "<%= banner %>(function(window,document,undefined) {\n"
           "\n}(window,document));"
         ]
+
+    concat:
+      combined:
+        src: 'dist/**/*.js'
+        dest: 'dist/<%= pkg.name %>-combined.js'
+
     uglify:
       options: 
         stripBanners: true
@@ -39,15 +46,20 @@ module.exports = (grunt) ->
         src: "dist/<%= pkg.name %>.js"
         dest: "dist/<%= pkg.name %>.min.js"
 
+      combined:
+        src: "dist/<%= pkg.name %>-combined.js"
+        dest: "dist/<%= pkg.name %>-combined.min.js"
+
     watch:
       scripts:
         files: 'src/**/*.coffee'
         tasks: 'default'
 
+  grunt.loadNpmTasks "grunt-contrib-concat"
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-uglify"
   grunt.loadTasks "./node_modules/grunt-contrib-coffee/tasks"
   grunt.loadNpmTasks "grunt-wrap"
 
   # Default task.
-  grunt.registerTask "default", "coffee wrap uglify".split(' ')
+  grunt.registerTask "default", "coffee wrap concat uglify".split(' ')
