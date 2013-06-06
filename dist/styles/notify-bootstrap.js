@@ -1,6 +1,6 @@
 
 $.notify.addStyle("bootstrap", {
-  html: "<div>\n<span data-notify-text></span>\n<span data-notify-src></span>\n</div>",
+  html: "<div>\n<span data-notify-text></span>\n</div>",
   classes: {
     base: {
       "font-weight": "bold",

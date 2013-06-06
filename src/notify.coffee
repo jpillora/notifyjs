@@ -68,6 +68,7 @@ coreStyle =
       display: block;
       height: inherit;
       width: inherit;
+      margin: 3px;
     }
 
     .#{pluginClassName}-wrapper {
@@ -299,14 +300,15 @@ class Notification
     elems[fn].apply elems, args
 
 
-  setGlobalPosition: (position) ->
+  setGlobalPosition: () ->
+    position = @getPosition()
 
     [pMain, pAlign] = position
 
     main = positions[pMain]
     align = positions[pAlign]
 
-    key = position pMain+"|"+pAlign
+    key = pMain+"|"+pAlign
     anchor = globalAnchors[key]
     unless anchor
       anchor = globalAnchors[key] = createElem("div")
@@ -323,7 +325,8 @@ class Notification
 
     anchor.prepend @wrapper
 
-  setElementPosition: (position) ->
+  setElementPosition: () ->
+    position = @getPosition()
 
     [pMain, pAlign, pArrow] = position
 
@@ -465,11 +468,10 @@ class Notification
     @updateClasses()
 
     #positioning
-    position = @getPosition()
     if @elem
-      @setElementPosition position
+      @setElementPosition()
     else
-      @setGlobalPosition position
+      @setGlobalPosition()
 
     @show true
 
@@ -509,7 +511,7 @@ $.fn[pluginName] = (data, options) ->
   @
 
 #extra methods
-$.extend $[pluginName], { defaults, addStyle }
+$.extend $[pluginName], { defaults, addStyle, pluginOptions }
 
 #when ready
 $ ->

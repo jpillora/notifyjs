@@ -54,7 +54,7 @@ styles = {};
 coreStyle = {
   name: 'core',
   html: "<div class=\"" + pluginClassName + "-wrapper\">\n  <div class=\"" + pluginClassName + "-arrow\"></div>\n  <div class=\"" + pluginClassName + "-container\"></div>\n</div>",
-  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + pluginClassName + "-text {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
+  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n  margin: 3px;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + pluginClassName + "-text {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
 };
 
 stylePrefixes = {
@@ -259,12 +259,13 @@ Notification = (function() {
     return elems[fn].apply(elems, args);
   };
 
-  Notification.prototype.setGlobalPosition = function(position) {
-    var align, anchor, css, key, main, pAlign, pMain;
+  Notification.prototype.setGlobalPosition = function() {
+    var align, anchor, css, key, main, pAlign, pMain, position;
+    position = this.getPosition();
     pMain = position[0], pAlign = position[1];
     main = positions[pMain];
     align = positions[pAlign];
-    key = position(pMain + "|" + pAlign);
+    key = pMain + "|" + pAlign;
     anchor = globalAnchors[key];
     if (!anchor) {
       anchor = globalAnchors[key] = createElem("div");
@@ -283,8 +284,9 @@ Notification = (function() {
     return anchor.prepend(this.wrapper);
   };
 
-  Notification.prototype.setElementPosition = function(position) {
-    var arrowColor, arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, gap, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, pos, posFull, wrapPos, _i, _j, _len, _len1, _ref;
+  Notification.prototype.setElementPosition = function() {
+    var arrowColor, arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, gap, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, pos, posFull, position, wrapPos, _i, _j, _len, _len1, _ref;
+    position = this.getPosition();
     pMain = position[0], pAlign = position[1], pArrow = position[2];
     elemPos = this.elem.position();
     elemH = this.elem.outerHeight();
@@ -401,8 +403,7 @@ Notification = (function() {
   };
 
   Notification.prototype.run = function(data, options) {
-    var position,
-      _this = this;
+    var _this = this;
     if ($.isPlainObject(options)) {
       $.extend(this.options, options);
     } else if ($.type(options) === 'string') {
@@ -416,11 +417,10 @@ Notification = (function() {
     }
     this.text[this.rawHTML ? 'html' : 'text'](data);
     this.updateClasses();
-    position = this.getPosition();
     if (this.elem) {
-      this.setElementPosition(position);
+      this.setElementPosition();
     } else {
-      this.setGlobalPosition(position);
+      this.setGlobalPosition();
     }
     this.show(true);
     if (this.options.autoHide) {
@@ -465,7 +465,8 @@ $.fn[pluginName] = function(data, options) {
 
 $.extend($[pluginName], {
   defaults: defaults,
-  addStyle: addStyle
+  addStyle: addStyle,
+  pluginOptions: pluginOptions
 });
 
 $(function() {
