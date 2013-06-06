@@ -3,6 +3,7 @@ $.notify.addStyle "bootstrap",
   html: """
     <div>
     <span data-notify-text></span>
+    <span data-notify-src></span>
     </div>
   """
   classes:

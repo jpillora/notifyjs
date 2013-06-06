@@ -1,11 +1,11 @@
-/** Notify.js - v0.0.1 - 2013/06/05
+/** Notify.js - v0.0.1 - 2013/06/06
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, addStyle, coreStyle, cornerElem, createElem, defaults, getAnchorElement, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
+var Notification, addStyle, coreStyle, createElem, defaults, getAnchorElement, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 pluginName = 'notify';
@@ -54,7 +54,7 @@ styles = {};
 coreStyle = {
   name: 'core',
   html: "<div class=\"" + pluginClassName + "-wrapper\">\n  <div class=\"" + pluginClassName + "-arrow\"></div>\n  <div class=\"" + pluginClassName + "-container\"></div>\n</div>",
-  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  top: 0;\n  right: 0;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + pluginClassName + "-text {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
+  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + pluginClassName + "-text {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
 };
 
 stylePrefixes = {
@@ -62,18 +62,15 @@ stylePrefixes = {
 };
 
 addStyle = function(name, def) {
-  var cssText;
-  if (styles[name]) {
+  var cssText, _ref;
+  if ((_ref = styles[name]) != null ? _ref.cssElem : void 0) {
     if (window.console) {
       console.warn("" + pluginName + ": overwriting style '" + name + "'");
     }
-    $("#notify-" + name).remove();
+    styles[name].cssElem.remove();
   }
   def.name = name;
   styles[name] = def;
-  if (def.cssElem) {
-    return;
-  }
   cssText = "";
   if (def.classes) {
     $.each(def.classes, function(className, props) {
@@ -124,8 +121,7 @@ pluginOptions = {
   showDuration: 400,
   hideAnimation: 'slideUp',
   hideDuration: 200,
-  offsetY: 0,
-  offsetX: 0
+  gap: 5
 };
 
 inherit = function(a, b) {
@@ -143,7 +139,7 @@ createElem = function(tag) {
   return $("<" + tag + "></" + tag + ">");
 };
 
-cornerElem = createElem("div").addClass("" + pluginClassName + "-corner");
+globalAnchors = {};
 
 getAnchorElement = function(element) {
   var radios;
@@ -170,7 +166,7 @@ incr = function(obj, pos, val) {
   temp = pos;
   if (obj[opp] !== undefined) {
     pos = positions[opp.charAt(0)];
-    val *= -1;
+    val = -val;
   }
   if (obj[pos] === undefined) {
     obj[pos] = val;
@@ -212,9 +208,6 @@ Notification = (function() {
       this.elem = getAnchorElement(elem);
       this.elem.data(pluginClassName, this);
       this.elem.before(this.wrapper);
-    } else {
-      this.options.arrowShow = false;
-      cornerElem.prepend(this.wrapper);
     }
     this.container.hide();
     this.run(data);
@@ -235,11 +228,17 @@ Notification = (function() {
     return this.text.addClass("" + pluginClassName + "-text");
   };
 
-  Notification.prototype.show = function(show, callback) {
-    var args, elems, fn, hidden;
-    if (callback == null) {
-      callback = $.noop;
-    }
+  Notification.prototype.show = function(show, userCallback) {
+    var args, callback, elems, fn, hidden,
+      _this = this;
+    callback = function() {
+      if (!show && !_this.elem) {
+        _this.destroy();
+      }
+      if (userCallback) {
+        return userCallback();
+      }
+    };
     hidden = this.container.parent().parents(':hidden').length > 0;
     elems = this.container.add(this.arrow);
     args = [];
@@ -260,11 +259,33 @@ Notification = (function() {
     return elems[fn].apply(elems, args);
   };
 
-  Notification.prototype.updatePosition = function() {
-    var arrowColor, arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, padding, pos, posFull, position, style, wrapPos, _i, _len;
-    if (!this.elem) {
-      return;
+  Notification.prototype.setGlobalPosition = function(position) {
+    var align, anchor, css, key, main, pAlign, pMain;
+    pMain = position[0], pAlign = position[1];
+    main = positions[pMain];
+    align = positions[pAlign];
+    key = position(pMain + "|" + pAlign);
+    anchor = globalAnchors[key];
+    if (!anchor) {
+      anchor = globalAnchors[key] = createElem("div");
+      css = {};
+      css[main] = 0;
+      if (align === 'middle') {
+        css.top = '45%';
+      } else if (align === 'center') {
+        css.left = '45%';
+      } else {
+        css[align] = 0;
+      }
+      anchor.css(css).addClass("" + pluginClassName + "-corner");
+      $("body").append(anchor);
     }
+    return anchor.prepend(this.wrapper);
+  };
+
+  Notification.prototype.setElementPosition = function(position) {
+    var arrowColor, arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, gap, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, pos, posFull, wrapPos, _i, _j, _len, _len1, _ref;
+    pMain = position[0], pAlign = position[1], pArrow = position[2];
     elemPos = this.elem.position();
     elemH = this.elem.outerHeight();
     elemW = this.elem.outerWidth();
@@ -273,37 +294,31 @@ Notification = (function() {
     wrapPos = this.wrapper.position();
     contH = this.container.height();
     contW = this.container.width();
-    position = this.getPosition();
-    pMain = position[0];
-    pAlign = position[1];
-    pArrow = position[2] || pAlign;
     mainFull = positions[pMain];
     opp = opposites[pMain];
     oppFull = positions[opp];
     css = {};
     css[oppFull] = pMain === 'b' ? elemH : pMain === 'r' ? elemW : 0;
+    incr(css, 'top', elemPos.top - wrapPos.top);
     incr(css, 'left', elemPos.left - wrapPos.left);
-    margin = parseInt(this.elem.css("margin-left"), 10);
-    if (margin) {
-      incr(css, 'left', margin);
-    }
-    if (/^inline/.test(this.elem.css('display'))) {
-      padding = parseInt(this.elem.css("padding-top"), 10);
-      if (padding) {
-        incr(css, 'top', -padding);
+    _ref = ['top', 'left'];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      pos = _ref[_i];
+      margin = parseInt(this.elem.css("margin-" + pos), 10);
+      if (margin) {
+        incr(css, pos, margin);
       }
     }
-    incr(css, 'top', this.options.offsetY);
-    incr(css, 'left', this.options.offsetX);
-    style = this.getStyle();
+    gap = Math.max(0, this.options.gap - (this.options.arrowShow ? arrowSize : 0));
+    incr(css, oppFull, gap);
     if (!this.options.arrowShow) {
       this.arrow.hide();
     } else {
       arrowSize = this.options.arrowSize;
       arrowCss = $.extend({}, css);
       arrowColor = this.userContainer.css("border-color") || this.userContainer.css("background-color") || 'white';
-      for (_i = 0, _len = mainPositions.length; _i < _len; _i++) {
-        pos = mainPositions[_i];
+      for (_j = 0, _len1 = mainPositions.length; _j < _len1; _j++) {
+        pos = mainPositions[_j];
         posFull = positions[pos];
         if (pos === opp) {
           continue;
@@ -349,10 +364,10 @@ Notification = (function() {
     if (pos.length === 1 || ((_ref1 = pos[0], __indexOf.call(vAligns, _ref1) >= 0) && (_ref2 = pos[1], __indexOf.call(hAligns, _ref2) < 0)) || ((_ref3 = pos[0], __indexOf.call(hAligns, _ref3) >= 0) && (_ref4 = pos[1], __indexOf.call(vAligns, _ref4) < 0))) {
       pos[1] = (_ref5 = pos[0], __indexOf.call(hAligns, _ref5) >= 0) ? 'm' : 'l';
     }
-    if (!this.options.autoReposition) {
-      return pos;
+    if (pos.length === 2) {
+      pos[2] = pos[1];
     }
-    throw "Not implemented";
+    return pos;
   };
 
   Notification.prototype.getStyle = function(name) {
@@ -386,7 +401,8 @@ Notification = (function() {
   };
 
   Notification.prototype.run = function(data, options) {
-    var _this = this;
+    var position,
+      _this = this;
     if ($.isPlainObject(options)) {
       $.extend(this.options, options);
     } else if ($.type(options) === 'string') {
@@ -398,13 +414,14 @@ Notification = (function() {
     } else if (!this.container && !data) {
       return;
     }
-    if ($.type(data) === 'string') {
-      this.text[this.rawHTML ? 'html' : 'text'](data);
-    } else {
-      this.text.empty().append(data);
-    }
+    this.text[this.rawHTML ? 'html' : 'text'](data);
     this.updateClasses();
-    this.updatePosition();
+    position = this.getPosition();
+    if (this.elem) {
+      this.setElementPosition(position);
+    } else {
+      this.setGlobalPosition(position);
+    }
     this.show(true);
     if (this.options.autoHide) {
       clearTimeout(this.autohideTimer);
@@ -415,10 +432,7 @@ Notification = (function() {
   };
 
   Notification.prototype.destroy = function() {
-    var _this = this;
-    return this.show(false, function() {
-      return _this.wrapper.remove();
-    });
+    return this.wrapper.remove();
   };
 
   return Notification;
@@ -455,15 +469,6 @@ $.extend($[pluginName], {
 });
 
 $(function() {
-  $("body").append(cornerElem);
-  $("link").each(function() {
-    var bootstrapDetected, src;
-    src = $(this).attr('href');
-    if (src.match(/bootstrap/)) {
-      bootstrapDetected = true;
-      return false;
-    }
-  });
   insertCSS(coreStyle.css).attr('data-notify-style', 'core');
   return $(document).on('click', "." + pluginClassName + "-wrapper", function() {
     var inst;

@@ -48,21 +48,16 @@ coreStyle =
       <div class="#{pluginClassName}-container"></div>
     </div>
   """
-
-    # <div class="#{pluginClassName}Debug"></div>
-
-    # .#{pluginClassName}Debug {
+    #   <div class="#{pluginClassName}-debug"></div>
+    # .#{pluginClassName}-debug {
     #   position: absolute;
     #   border: 3px solid red;
     #   height: 0;
     #   width: 0;
     # }
-
   css: """
     .#{pluginClassName}-corner {
       position: fixed;
-      top: 0;
-      right: 0;
       margin: 5px;
       z-index: 1050;
     }
@@ -106,15 +101,14 @@ stylePrefixes =
   "border-radius": ["-webkit-", "-moz-"]
 
 addStyle = (name, def) ->
-  if styles[name]
+
+  if styles[name]?.cssElem
     if window.console
       console.warn "#{pluginName}: overwriting style '#{name}'"
-    $("#notify-#{name}").remove()
+    styles[name].cssElem.remove()
 
   def.name = name
   styles[name] = def
-
-  return if def.cssElem
 
   cssText = ""
   if def.classes
@@ -161,18 +155,13 @@ pluginOptions =
   arrowSize: 5
   elementPosition: 'bottom'
   globalPosition: 'top right'
-  # Default style
   style: 'bootstrap'
   className: 'error'
   showAnimation: 'slideDown'
   showDuration: 400
   hideAnimation: 'slideUp'
   hideDuration: 200
-  # Gap between main and element
-  offsetY: 0
-  offsetX: 0
-  #TODO add z-index watches
-  #parents:  { '.ui-dialog': 5001 }
+  gap: 5
 
 inherit = (a, b) ->
   F = () ->
@@ -190,8 +179,9 @@ defaults = (opts) ->
 createElem = (tag) ->
   $ "<#{tag}></#{tag}>"
 
-# container for element-less notifications
-cornerElem = createElem("div").addClass("#{pluginClassName}-corner")
+
+# references to global anchor positions
+globalAnchors = {}
 
 #gets first on n radios, and gets the fancy stylised input for hidden inputs
 getAnchorElement = (element) ->
@@ -218,7 +208,7 @@ incr = (obj, pos, val) ->
   #use the opposite if exists
   if obj[opp] isnt `undefined`
     pos = positions[opp.charAt(0)]
-    val *= -1
+    val = -val
 
   if obj[pos] is `undefined`
     obj[pos] = val
@@ -248,7 +238,7 @@ class Notification
     options = {className: options} if typeof options is 'string'
     @options = inherit pluginOptions, if $.isPlainObject(options) then options else {}
 
-    #load user html into @userContainer
+    #load style html into @userContainer
     @loadHTML()
 
     @wrapper = $(coreStyle.html)
@@ -264,10 +254,6 @@ class Notification
       @elem.data pluginClassName, @
       # add into dom above elem
       @elem.before @wrapper
-    else
-      # @options.autoHide = true
-      @options.arrowShow = false
-      cornerElem.prepend @wrapper
 
     @container.hide()
     @run(data)
@@ -284,7 +270,11 @@ class Notification
 
     @text.addClass "#{pluginClassName}-text"
 
-  show: (show, callback = $.noop) ->
+  show: (show, userCallback) ->
+
+    callback = =>
+      @destroy() if not show and not @elem
+      userCallback() if userCallback
 
     hidden = @container.parent().parents(':hidden').length > 0
 
@@ -308,8 +298,34 @@ class Notification
 
     elems[fn].apply elems, args
 
-  updatePosition: ->
-    return unless @elem
+
+  setGlobalPosition: (position) ->
+
+    [pMain, pAlign] = position
+
+    main = positions[pMain]
+    align = positions[pAlign]
+
+    key = position pMain+"|"+pAlign
+    anchor = globalAnchors[key]
+    unless anchor
+      anchor = globalAnchors[key] = createElem("div")
+      css = {}
+      css[main] = 0
+      if align is 'middle'
+        css.top = '45%'
+      else if align is 'center'
+        css.left = '45%'
+      else
+        css[align] = 0
+      anchor.css(css).addClass("#{pluginClassName}-corner")
+      $("body").append anchor
+
+    anchor.prepend @wrapper
+
+  setElementPosition: (position) ->
+
+    [pMain, pAlign, pArrow] = position
 
     #grab some dimensions
     elemPos = @elem.position()
@@ -321,12 +337,6 @@ class Notification
     contH = @container.height()
     contW = @container.width()
 
-    #get user defined position
-    position = @getPosition()
-
-    pMain  = position[0]
-    pAlign = position[1]
-    pArrow = position[2] or pAlign
 
     #start calculations
     mainFull = positions[pMain]
@@ -343,21 +353,21 @@ class Notification
 
     #correct for elem-wrapper offset
     # unless navigator.userAgent.match /MSIE/
-    #   incr css, 'top', (elemPos.top - wrapPos.top)
+    incr css, 'top', elemPos.top - wrapPos.top
     incr css, 'left', elemPos.left - wrapPos.left
 
-    #correct for left margin
-    margin = parseInt @elem.css("margin-left"), 10
-    incr css, 'left', margin if margin
-    #correct for inline top padding
-    if /^inline/.test @elem.css('display')
-      padding = parseInt @elem.css("padding-top"), 10
-      incr css, 'top', -padding if padding
-    #user defined offset
-    incr css, 'top', @options.offsetY
-    incr css, 'left', @options.offsetX
+    #correct for margins
+    for pos in ['top', 'left']
+      margin = parseInt @elem.css("margin-#{pos}"), 10
+      incr css, pos, margin if margin
+      #correct for paddings (only for inline)
+      # if /^inline/.test @elem.css('display')
+      #   padding = parseInt @elem.css("padding-#{pos}"), 10
+      #   incr css, pos, -padding if padding
 
-    style = @getStyle()
+    #add gap
+    gap = Math.max 0, @options.gap - if @options.arrowShow then arrowSize else 0
+    incr css, oppFull, gap
 
     #calculate arrow
     if not @options.arrowShow
@@ -408,13 +418,10 @@ class Notification
        (pos[0] in hAligns and pos[1] not in vAligns)
       pos[1] = if pos[0] in hAligns then 'm' else 'l'
 
-    unless @options.autoReposition
-      return pos
+    if pos.length is 2
+      pos[2] = pos[1]
 
-    # if @elem.position().left + @elem.width() + @wrapper.width() < $(window).width()
-    #   return 'right'
-    # return 'bottom'
-    throw "Not implemented"
+    return pos
 
   getStyle: (name) ->
     name = @options.style unless name
@@ -435,7 +442,6 @@ class Notification
     classes = $.map(classes, (n) -> "#{pluginClassName}-#{style.name}-#{n}").join ' '
 
     @userContainer.attr 'class', classes
-      
 
   #run plugin
   run: (data, options) ->
@@ -453,16 +459,17 @@ class Notification
       return
 
     #update content
-    if $.type(data) is 'string'
-      @text[if @rawHTML then 'html' else 'text'](data)
-    else
-      @text.empty().append(data)
+    @text[if @rawHTML then 'html' else 'text'](data)
 
     #set styles
     @updateClasses()
 
-    #position
-    @updatePosition()
+    #positioning
+    position = @getPosition()
+    if @elem
+      @setElementPosition position
+    else
+      @setGlobalPosition position
 
     @show true
 
@@ -474,8 +481,7 @@ class Notification
       , @options.autoHideDelay
 
   destroy: ->
-    @show false, =>
-      @wrapper.remove()
+    @wrapper.remove()
 
 
 # ================================
@@ -502,21 +508,11 @@ $.fn[pluginName] = (data, options) ->
       new Notification $(@), data, options
   @
 
-#extra
+#extra methods
 $.extend $[pluginName], { defaults, addStyle }
 
 #when ready
 $ ->
-  #corner notification container
-  $("body").append cornerElem
-
-  #auto-detect bootstrap
-  $("link").each ->
-    src =  $(@).attr 'href'
-    if src.match /bootstrap/
-      bootstrapDetected = true
-      return false
-
   #insert default style
   insertCSS(coreStyle.css).attr('data-notify-style', 'core')
 

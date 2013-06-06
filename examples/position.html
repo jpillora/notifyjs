@@ -28,13 +28,15 @@
     var positions = ["top", "right", "bottom", "left"];
     var boxes = $(".boxes");
 
-    $.each(positions, function(i, p) {
-      var box = $("<div class=\"box\">"+p+"</div>");
-      boxes.append($("<div class=\"wrapper\"/>").append(box));
+    $.notify.defaults({ arrowShow: false })
+    $(function() {
+      $.each(positions, function(i, p) {
+        var box = $("<div class=\"box\">"+p+"</div>");
+        boxes.append($("<div class=\"wrapper\"/>").append(box));
 
-      setTimeout(function() {
         box.notify(p, {position: p+" center"});
-      }, 500)
+      });
+
     });
   </script>
 

@@ -1,0 +1,112 @@
+<html>
+<head>
+  <title></title>
+  <style type="text/css">
+    .z {
+      display: inline-block;
+    }
+
+    .a {
+      height: 50px;
+      width: 70px;
+      background: lightblue;
+    }
+
+    .b {
+      height: 100px;
+      width: 50px;
+      background: pink;
+    }
+
+    .c {
+      height: 20px;
+      width: 200px;
+      background: lightgreen;
+    }
+
+    hr {
+      margin: 25px 0 25px 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <hr/>
+
+  <div style="padding: 50px; margin: 50px; width: 592px;">
+    <div class="z a">a</div>
+    <div class="z b s">S</div>
+    <div class="z c">c</div>
+    <div class="z a">a</div>
+    <div class="z b">b</div>
+    <div class="z c t">T</div>
+    <div class="z a">a</div>
+    <div class="z b">b</div>
+    <div class="z c">c</div>
+  </div>
+
+  <hr/>
+
+  <div>
+    <div class="z b">b</div>
+    <span class="inline">some inline text</span>
+  </div>
+  
+  <hr/>
+
+  <div>
+    <span>some inline text</span>
+    <span class="inline" style="padding: 20px; border: thin solid pink;">and special padding</span>
+  </div>
+  
+  <hr/>
+
+  <div>
+    <span>some inline text</span>
+    <span class="inline" style="margin: 20px; border: thin solid pink;">and special margin</span>
+  </div>
+  
+  <hr/>
+
+  <div>
+    <span>some inline text</span>
+    <span class="inline" style="margin: 20px; padding: 20px; border: thin solid pink;">and special padding margin</span>
+  </div>
+  
+  <hr/>
+
+  <div>
+    <span>some inline block text</span>
+    <span class="inline" style="display: inline-block; margin: 20px; padding: 20px; border: thin solid pink;">and special padding margin</span>
+  </div>
+  
+  <hr/>
+
+  <div>
+    <canvas width="100px" height="100px"></canvas>
+    <span>some canvas</span>
+    <span class="inline" style="display: inline-block; margin: 20px; padding: 20px; border: thin solid pink;">and special padding margin</span>
+  </div>
+  
+  <hr/>
+
+
+
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+  <script src="../dist/notify.js"></script>
+  <script src="../dist/styles/notify-bootstrap.js"></script>
+  <script type="text/javascript">
+
+    $.notify.defaults({autoHide: false})
+    $(function() {
+      $(".s").notify("s", {position: "right"})
+      $(".t").notify("t", {position: "top"})
+      $(".inline").notify("inline!", {position: "right"})
+    });
+  </script>
+
+</body>
+</html>
