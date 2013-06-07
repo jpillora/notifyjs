@@ -1,8 +1,10 @@
+Notify.js
+=====
 
-### Notify.js - A simple, versatile notification library
-
-For documentation, downloads and demos:
-
-## http://notifyjs.com
+> A simple, versatile notification library
 
 
+
+See demos and full documentation at:
+
+## http://notifyjs.com/
