@@ -101,7 +101,15 @@ coreStyle =
 stylePrefixes =
   "border-radius": ["-webkit-", "-moz-"]
 
+getStyle = (name) ->
+  styles[name]
+
 addStyle = (name, def) ->
+
+  unless name
+    throw "Missing Style name"
+  unless def
+    throw "Missing Style definition"
 
   if styles[name]?.cssElem
     if window.console
@@ -511,7 +519,7 @@ $.fn[pluginName] = (data, options) ->
   @
 
 #extra methods
-$.extend $[pluginName], { defaults, addStyle, pluginOptions }
+$.extend $[pluginName], { defaults, addStyle, pluginOptions, getStyle }
 
 #when ready
 $ ->
