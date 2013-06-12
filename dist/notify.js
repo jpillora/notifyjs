@@ -1,4 +1,4 @@
-/** Notify.js - v0.0.1 - 2013/06/11
+/** Notify.js - v0.0.1 - 2013/06/12
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
@@ -109,6 +109,7 @@ addStyle = function(name, def) {
 insertCSS = function(cssText) {
   var elem;
   elem = createElem("style");
+  elem.attr('type', 'text/css');
   $("head").append(elem);
   try {
     elem.html(cssText);
@@ -119,6 +120,7 @@ insertCSS = function(cssText) {
 };
 
 pluginOptions = {
+  clickToHide: true,
   autoHide: true,
   autoHideDelay: 5000,
   arrowShow: true,
@@ -477,21 +479,17 @@ $.extend($[pluginName], {
   defaults: defaults,
   addStyle: addStyle,
   pluginOptions: pluginOptions,
-  getStyle: getStyle
+  getStyle: getStyle,
+  insertCSS: insertCSS
 });
 
 $(function() {
-  insertCSS(coreStyle.css).attr('data-notify-style', 'core');
-  return $(document).on('click', "." + pluginClassName + "-wrapper", function() {
+  insertCSS(coreStyle.css).attr('id', 'core-notify');
+  return $(document).on('click notify-hide', "." + pluginClassName + "-wrapper", function(e) {
     var inst;
     inst = $(this).data(pluginClassName);
-    if (!inst) {
-      return;
-    }
-    if (inst.elem) {
+    if (inst && (inst.options.clickToHide || e.type === 'notify-hide')) {
       return inst.show(false);
-    } else {
-      return inst.destroy();
     }
   });
 });

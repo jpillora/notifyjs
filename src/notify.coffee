@@ -144,6 +144,7 @@ addStyle = (name, def) ->
 insertCSS = (cssText) ->
 
   elem = createElem("style")
+  elem.attr 'type', 'text/css'
   $("head").append elem
   try
     elem.html cssText
@@ -158,6 +159,7 @@ insertCSS = (cssText) ->
 
 #overridable options
 pluginOptions =
+  clickToHide: true
   autoHide: true
   autoHideDelay: 5000
   arrowShow: true
@@ -519,19 +521,16 @@ $.fn[pluginName] = (data, options) ->
   @
 
 #extra methods
-$.extend $[pluginName], { defaults, addStyle, pluginOptions, getStyle }
+$.extend $[pluginName], { defaults, addStyle, pluginOptions, getStyle, insertCSS }
 
 #when ready
 $ ->
   #insert default style
-  insertCSS(coreStyle.css).attr('data-notify-style', 'core')
+  insertCSS(coreStyle.css).attr('id', 'core-notify')
 
   #watch all notifications clicks
-  $(document).on 'click', ".#{pluginClassName}-wrapper", ->
+  $(document).on 'click notify-hide', ".#{pluginClassName}-wrapper", (e) ->
     inst = $(@).data pluginClassName
-    return unless inst
-    if inst.elem
+    if inst and (inst.options.clickToHide or e.type is 'notify-hide')
       inst.show false
-    else
-      inst.destroy()
 
