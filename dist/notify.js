@@ -1,11 +1,11 @@
-/** Notify.js - v0.0.1 - 2013/06/12
+/** Notify.js - v0.0.1 - 2013/06/14
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,undefined) {
 'use strict';
 
-var Notification, addStyle, coreStyle, createElem, defaults, getAnchorElement, getStyle, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
+var Notification, addStyle, coreStyle, createElem, defaults, encode, getAnchorElement, getStyle, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 pluginName = 'notify';
@@ -125,6 +125,7 @@ pluginOptions = {
   autoHideDelay: 5000,
   arrowShow: true,
   arrowSize: 5,
+  breakNewLines: true,
   elementPosition: 'bottom',
   globalPosition: 'top right',
   style: 'bootstrap',
@@ -197,6 +198,11 @@ realign = function(alignment, inner, outer) {
     return outer - inner;
   }
   throw "Invalid alignment";
+};
+
+encode = function(text) {
+  encode.e = encode.e || createElem("div");
+  return encode.e.text(text).html();
 };
 
 Notification = (function() {
@@ -427,7 +433,13 @@ Notification = (function() {
     } else if (!this.container && !data) {
       return;
     }
-    this.text[this.rawHTML ? 'html' : 'text'](data);
+    if (!this.rawHTML) {
+      data = encode(data);
+      if (this.options.breakNewLines) {
+        data = data.replace(/\n/, '<br/>');
+      }
+    }
+    this.text.html(data);
     this.updateClasses();
     if (this.elem) {
       this.setElementPosition();

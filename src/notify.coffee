@@ -164,6 +164,7 @@ pluginOptions =
   autoHideDelay: 5000
   arrowShow: true
   arrowSize: 5
+  breakNewLines: true
   elementPosition: 'bottom'
   globalPosition: 'top right'
   style: 'bootstrap'
@@ -236,6 +237,9 @@ realign = (alignment, inner, outer) ->
     outer - inner
   throw "Invalid alignment"
 
+encode = (text) ->
+  encode.e = encode.e or createElem "div"
+  encode.e.text(text).html()
 
 # ================================
 #  NOTIFY CLASS
@@ -471,8 +475,12 @@ class Notification
     else if not @container and not data
       return
 
+    #escape
+    unless @rawHTML
+      data = encode(data)
+      data = data.replace(/\n/,'<br/>') if @options.breakNewLines
     #update content
-    @text[if @rawHTML then 'html' else 'text'](data)
+    @text.html(data)
 
     #set styles
     @updateClasses()
