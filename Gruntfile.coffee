@@ -28,8 +28,8 @@ module.exports = (grunt) ->
         src: 'dist/<%= pkg.name %>.js'
         dest: '.'
         wrapper: [
-          "<%= banner %>(function(window,document,undefined) {\n"
-          "\n}(window,document));"
+          "<%= banner %>(function(window,document,$,undefined) {\n"
+          "\n}(window,document,jQuery));"
         ]
 
     concat:
@@ -58,7 +58,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-concat"
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-uglify"
-  grunt.loadTasks "./node_modules/grunt-contrib-coffee/tasks"
+  grunt.loadNpmTasks "grunt-contrib-coffee"
   grunt.loadNpmTasks "grunt-wrap"
 
   # Default task.

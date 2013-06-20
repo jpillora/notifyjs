@@ -165,6 +165,7 @@ pluginOptions =
   arrowShow: true
   arrowSize: 5
   breakNewLines: true
+  # autoReposition: true
   elementPosition: 'bottom'
   globalPosition: 'top right'
   style: 'bootstrap'
@@ -190,7 +191,6 @@ defaults = (opts) ->
 # plugin helpers
 createElem = (tag) ->
   $ "<#{tag}></#{tag}>"
-
 
 # references to global anchor positions
 globalAnchors = {}
@@ -478,7 +478,7 @@ class Notification
     #escape
     unless @rawHTML
       data = encode(data)
-      data = data.replace(/\n/,'<br/>') if @options.breakNewLines
+      data = data.replace(/\n/g,'<br/>') if @options.breakNewLines
     #update content
     @text.html(data)
 

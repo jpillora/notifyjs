@@ -1,8 +1,8 @@
-/** Notify.js - v0.0.1 - 2013/06/14
+/** Notify.js - v0.0.1 - 2013/06/21
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
-(function(window,document,undefined) {
+(function(window,document,$,undefined) {
 'use strict';
 
 var Notification, addStyle, coreStyle, createElem, defaults, encode, getAnchorElement, getStyle, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
@@ -436,7 +436,7 @@ Notification = (function() {
     if (!this.rawHTML) {
       data = encode(data);
       if (this.options.breakNewLines) {
-        data = data.replace(/\n/, '<br/>');
+        data = data.replace(/\n/g, '<br/>');
       }
     }
     this.text.html(data);
@@ -506,4 +506,4 @@ $(function() {
   });
 });
 
-}(window,document));
+}(window,document,jQuery));
