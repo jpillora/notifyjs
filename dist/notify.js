@@ -202,7 +202,7 @@ realign = function(alignment, inner, outer) {
 
 encode = function(text) {
   encode.e = encode.e || createElem("div");
-  return encode.e.text(text).html();
+  return text; 
 };
 
 Notification = (function() {

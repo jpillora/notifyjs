@@ -239,7 +239,7 @@ realign = (alignment, inner, outer) ->
 
 encode = (text) ->
   encode.e = encode.e or createElem "div"
-  encode.e.text(text).html()
+  text
 
 # ================================
 #  NOTIFY CLASS
