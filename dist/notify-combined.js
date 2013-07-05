@@ -1,16 +1,18 @@
-/** Notify.js - v0.0.1 - 2013/06/21
+/** Notify.js - v0.3.1 - 2013/07/05
  * http://notifyjs.com/
  * Copyright (c) 2013 Jaime Pillora - MIT
  */
 (function(window,document,$,undefined) {
 'use strict';
 
-var Notification, addStyle, coreStyle, createElem, defaults, encode, getAnchorElement, getStyle, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
+var Notification, addStyle, blankFieldName, coreStyle, createElem, defaults, encode, find, findFields, getAnchorElement, getStyle, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 pluginName = 'notify';
 
 pluginClassName = pluginName + 'js';
+
+blankFieldName = pluginName + "!blank";
 
 positions = {
   t: 'top',
@@ -54,7 +56,7 @@ styles = {};
 coreStyle = {
   name: 'core',
   html: "<div class=\"" + pluginClassName + "-wrapper\">\n  <div class=\"" + pluginClassName + "-arrow\"></div>\n  <div class=\"" + pluginClassName + "-container\"></div>\n</div>",
-  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n  margin: 3px;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n." + pluginClassName + "-text {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
+  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n  margin: 3px;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n[data-notify-text],[data-notify-html] {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
 };
 
 stylePrefixes = {
@@ -66,12 +68,15 @@ getStyle = function(name) {
 };
 
 addStyle = function(name, def) {
-  var cssText, _ref;
+  var cssText, elem, fields, _ref;
   if (!name) {
     throw "Missing Style name";
   }
   if (!def) {
     throw "Missing Style definition";
+  }
+  if (!def.html) {
+    throw "Missing Style HTML";
   }
   if ((_ref = styles[name]) != null ? _ref.cssElem : void 0) {
     if (window.console) {
@@ -99,11 +104,15 @@ addStyle = function(name, def) {
   if (def.css) {
     cssText += "/* styles for " + def.name + " */\n" + def.css;
   }
-  if (!cssText) {
-    return;
+  if (cssText) {
+    def.cssElem = insertCSS(cssText);
+    def.cssElem.attr('id', "notify-" + def.name);
   }
-  def.cssElem = insertCSS(cssText);
-  return def.cssElem.attr('id', "notify-" + def.name);
+  fields = {};
+  elem = $(def.html);
+  findFields('html', elem, fields);
+  findFields('text', elem, fields);
+  return def.fields = fields;
 };
 
 insertCSS = function(cssText) {
@@ -117,6 +126,30 @@ insertCSS = function(cssText) {
     elem[0].styleSheet.cssText = cssText;
   }
   return elem;
+};
+
+findFields = function(type, elem, fields) {
+  var attr;
+  if (type !== 'html') {
+    type = 'text';
+  }
+  attr = "data-notify-" + type;
+  return find(elem, "[" + attr + "]").each(function() {
+    var name;
+    name = $(this).attr(attr);
+    if (!name) {
+      name = blankFieldName;
+    }
+    return fields[name] = type;
+  });
+};
+
+find = function(elem, selector) {
+  if (elem.is(selector)) {
+    return elem;
+  } else {
+    return elem.find(selector);
+  }
 };
 
 pluginOptions = {
@@ -235,15 +268,7 @@ Notification = (function() {
     var style;
     style = this.getStyle();
     this.userContainer = $(style.html);
-    this.text = this.userContainer.find('[data-notify-text]');
-    if (this.text.length === 0) {
-      this.text = this.userContainer.find('[data-notify-html]');
-      this.rawHTML = true;
-    }
-    if (this.text.length === 0) {
-      throw "style: '" + name + "' HTML is missing a: 'data-notify-text' or 'data-notify-html' attribute";
-    }
-    return this.text.addClass("" + pluginClassName + "-text");
+    return this.userFields = style.fields;
   };
 
   Notification.prototype.show = function(show, userCallback) {
@@ -421,7 +446,8 @@ Notification = (function() {
   };
 
   Notification.prototype.run = function(data, options) {
-    var _this = this;
+    var d, datas, name, type, value,
+      _this = this;
     if ($.isPlainObject(options)) {
       $.extend(this.options, options);
     } else if ($.type(options) === 'string') {
@@ -433,13 +459,27 @@ Notification = (function() {
     } else if (!this.container && !data) {
       return;
     }
-    if (!this.rawHTML) {
-      data = encode(data);
-      if (this.options.breakNewLines) {
-        data = data.replace(/\n/g, '<br/>');
-      }
+    datas = {};
+    if ($.isPlainObject(data)) {
+      datas = data;
+    } else {
+      datas[blankFieldName] = data;
     }
-    this.text.html(data);
+    for (name in datas) {
+      d = datas[name];
+      type = this.userFields[name];
+      if (!type) {
+        continue;
+      }
+      if (type === 'text') {
+        d = encode(d);
+        if (this.options.breakNewLines) {
+          d = d.replace(/\n/g, '<br/>');
+        }
+      }
+      value = name === blankFieldName ? '' : '=' + name;
+      find(this.userContainer, "[data-notify-" + type + value + "]").html(d);
+    }
     this.updateClasses();
     if (this.elem) {
       this.setElementPosition();

@@ -4,6 +4,7 @@
 #plugin constants
 pluginName = 'notify'
 pluginClassName = pluginName+'js'
+blankFieldName = pluginName+"!blank"
 
 # ================================
 #  POSITIONING
@@ -86,7 +87,7 @@ coreStyle =
       cursor: pointer;
     }
 
-    .#{pluginClassName}-text {
+    [data-notify-text],[data-notify-html] {
       position: relative;
     }
 
@@ -110,6 +111,8 @@ addStyle = (name, def) ->
     throw "Missing Style name"
   unless def
     throw "Missing Style definition"
+  unless def.html
+    throw "Missing Style HTML"
 
   if styles[name]?.cssElem
     if window.console
@@ -137,9 +140,16 @@ addStyle = (name, def) ->
       #{def.css}
     """
 
-  return unless cssText
-  def.cssElem = insertCSS cssText
-  def.cssElem.attr('id', "notify-#{def.name}")
+  if cssText
+    def.cssElem = insertCSS cssText
+    def.cssElem.attr('id', "notify-#{def.name}")
+
+  #precompute usable text fields
+  fields = {}
+  elem = $(def.html)
+  findFields 'html', elem, fields
+  findFields 'text', elem, fields
+  def.fields = fields
 
 insertCSS = (cssText) ->
 
@@ -152,6 +162,17 @@ insertCSS = (cssText) ->
     elem[0].styleSheet.cssText = cssText
   elem
 
+# style.html helper
+findFields = (type, elem, fields) ->
+  type = 'text' if type isnt 'html'
+  attr = "data-notify-#{type}"
+  find(elem,"[#{attr}]").each ->
+    name = $(@).attr attr
+    name = blankFieldName unless name
+    fields[name] = type
+
+find = (elem, selector) ->
+  if elem.is(selector) then elem else elem.find selector
 
 # ================================
 #  OPTIONS
@@ -276,14 +297,7 @@ class Notification
   loadHTML: ->
     style = @getStyle()
     @userContainer = $(style.html)
-    @text = @userContainer.find '[data-notify-text]'
-    if @text.length is 0
-      @text = @userContainer.find '[data-notify-html]'
-      @rawHTML = true
-    if @text.length is 0
-      throw "style: '#{name}' HTML is missing a: 'data-notify-text' or 'data-notify-html' attribute"
-
-    @text.addClass "#{pluginClassName}-text"
+    @userFields = style.fields
 
   show: (show, userCallback) ->
 
@@ -475,12 +489,22 @@ class Notification
     else if not @container and not data
       return
 
-    #escape
-    unless @rawHTML
-      data = encode(data)
-      data = data.replace(/\n/g,'<br/>') if @options.breakNewLines
-    #update content
-    @text.html(data)
+    datas = {}
+    if $.isPlainObject data
+      datas = data
+    else
+      datas[blankFieldName] = data
+
+    for name, d of datas
+      type = @userFields[name]
+      continue unless type
+      if type is 'text'
+        #escape
+        d = encode(d)
+        d = d.replace(/\n/g,'<br/>') if @options.breakNewLines
+      #update content
+      value = if name is blankFieldName then '' else '='+name
+      find(@userContainer,"[data-notify-#{type}#{value}]").html(d)
 
     #set styles
     @updateClasses()

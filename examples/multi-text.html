@@ -1,0 +1,58 @@
+<html>
+<body>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+  <script src="../dist/notify.js"></script>
+
+  <style type="text/css">
+    .box {
+      display: inline-block;
+      border: thin solid blue;
+      padding: 10px;
+      margin: 50px;
+      width: 100px;
+    }
+  </style>
+
+  <div class="box 1">multi</div>
+  <div class="box 2">single</div>
+
+  <!-- run code -->
+  <script class="demo">
+
+    $.notify.defaults({ arrowShow: false })
+
+
+    $.notify.addStyle('single-text', {
+      html: "<div data-notify-text></div>"
+    });
+
+    $.notify.addStyle('multi-text', {
+      html: "<div>\n"+
+        "<p data-notify-text=\"title\"></p>\n"+
+        "<p data-notify-text=\"p1\"></p>\n"+
+        "<p data-notify-text=\"p2\"></p>\n"+
+        "</div>"
+    });
+
+    $(function() {
+
+
+
+      $(".1").notify({
+        title: "HELLO!",
+        p1: "little",
+        p2: "world"
+      }, {
+        style: 'multi-text'
+      })
+
+      $(".2").notify("hello world", {
+        style: 'single-text'
+      })
+
+    });
+  </script>
+
+</body>
+</html>
