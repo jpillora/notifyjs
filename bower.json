@@ -1,0 +1,14 @@
+{
+  "name": "notifyjs",
+  "version": "0.3.1",
+  "homepage": "http://notifyjs.com/",
+  "authors": [
+    "Jaime Pillora <dev@jpillora.com>"
+  ],
+  "description": "A simple, versatile notification library",
+  "main": "dist/notify.js",
+  "keywords": [
+    "notification"
+  ],
+  "license": "MIT"
+}
