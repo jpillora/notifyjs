@@ -1,0 +1,31 @@
+
+//- ====================================
+//-  USAGE
+//- ====================================
+.sixteen.columns
+  h3 Basic Usage
+
+.eight.columns
+  h4 Element Notifications
+
+  p You can place notifications on any element:
+
+  p: pre.prettyprint.runnable
+    | $(".elem-demo").notify("Hello Box");
+
+  p.center
+    | Like this 
+    span.box.elem-demo box
+
+.eight.columns
+  h4 Global Notifications
+
+  p 
+    | If you don't specify an element, notification
+    | will appear in the top left (unless you specify a
+    | different position - See 
+    a(data-highlight) Positioning
+    | )
+
+  p: pre.prettyprint.runnable
+    | $.notify("I'm over here !");

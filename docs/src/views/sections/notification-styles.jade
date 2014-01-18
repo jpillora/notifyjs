@@ -1,0 +1,31 @@
+//- ====================================
+//-  USAGE
+//- ====================================
+.sixteen.columns
+  h4 Notification Styles
+
+  p.
+    Each style may define a set of classes to use to substyle the notification.
+    The pre-packaged version includes a bootstrap notification style (see more below in Styling).
+    These classes include:
+
+  div
+    span Success
+    pre.prettyprint.runnable.indent1
+      | $.notify("Access granted", "success");
+    span Info
+    pre.prettyprint.runnable.indent1
+      | $.notify("Do not press this button", "info");
+    span Warning
+    pre.prettyprint.runnable.indent1
+      | $.notify("Warning: Self-destruct in 3.. 2..", "warn");
+    span Error
+    pre.prettyprint.runnable.indent1
+      | $.notify("BOOM!", "error");
+
+  p.italic(style="margin-top:10px")
+    | Note: This page has set the default class to
+    code "success"
+    |  with
+    code $.notify.defaults({ className: "success" });
+    | .

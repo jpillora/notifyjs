@@ -1,0 +1,86 @@
+//- ====================================
+//-  API
+//- ====================================
+.sixteen.columns
+  h3 API
+
+  .entry
+    h5
+      code.black $.notify( 
+      code string|object
+      code.black , [ 
+      code options
+      code.black  ])
+    p.indent1
+      code string|object
+      |  - global notification data
+      br
+      code options
+      |  - an options object or class name string 
+
+  .entry
+    h5
+      code.black $.notify( 
+      code element
+      code.black , 
+      code string|object
+      code.black , [ 
+      code options
+      code.black  ])
+    p.indent1
+      code element
+      |  - a jquery element
+      br
+      code string|object
+      |  - element notification data
+      br
+      code options
+      |  - an options object or class name string 
+
+  .entry
+    h5
+      code.black $( 
+      code selector
+      code.black  ).notify( 
+      code string|object
+      code.black , [ 
+      code options
+      code.black  ])
+    p.indent1
+      code selector
+      |  - jquery selector
+      br
+      code string|object
+      |  - element notification data
+      br
+      code options
+      |  - an options object or class name string 
+
+
+  .entry
+    h5
+      code.black $.notify.addStyle( 
+      code styleName
+      code.black , 
+      code styleDefinition
+      code.black  )
+    p.indent1
+      code styleName
+      |  - string (the  
+      b style
+      |  option references this name)
+      br
+      | 
+      code styleDefinition
+      |  - style definition object (see 
+      b Styling
+      |  below)
+
+  .entry
+    h5
+      code.black $.notify.defaults( 
+      code options
+      code.black  )
+    p.indent1
+      code options
+      |  - an options object (updates the defaults listed below) 

@@ -1,0 +1,67 @@
+//- ====================================
+//-  DOWNLOAD
+//- ====================================
+.eight.columns
+  h3 Download
+
+  p
+    | Download pre-packaged with the bootstrap notification style:
+    br
+    a(href="dist/notify-combined.min.js", data-download, data-name="notify.min")
+      button Download notify.min.js
+  
+    a(href="dist/notify-combined.js", data-download, data-name="notify")
+      button Download notify.js
+
+  p
+    | Or, create a custom build with a different style
+    br
+    button(disabled="disabled").build-tool-loading
+      | Loading...
+    button.build-tool-toggle
+      | Build a custom notify.js
+
+.sixteen.columns.build-tool(ng-app,ng-controller="BuildController")
+
+  p.center
+    | Notify.js Core 
+    button.active(disabled="disabled") Include
+  
+  hr
+
+  p
+    span.bold Styles 
+    br
+
+    .build-tool-style(ng-repeat="style in styles")
+
+      div
+        textarea.code(ng-model="style.code")
+
+      div.right
+        button(ng-click="active(style,'active')", ng-class="style.active && 'active'") Include
+        button(ng-click="useDefault(style)", ng-class="settings.default == style && 'active'") Default
+        button.test(ng-click="test($event,style,false)") Test Element
+        button.test(ng-click="test($event,style,true)") Test Global
+        button(ng-click="delete($index)") Delete
+
+    .build-tool-controls.center
+
+      button(ng-click="addStyle()") Add Style
+      select(ng-options="p.name for p in premadeStyles", ng-model="premadeStyle")
+      button(ng-click="loadStyle()") Load Style
+      span.italic Contribute more styles !
+
+  hr
+
+  p.center
+    | Minify 
+    button(ng-click="active(settings,'minify')", ng-class="settings.minify && 'active'") Minify this build
+
+  hr
+
+  p.center
+    button(ng-click="build()", ng-bind="building && 'Building...' || 'Download this build'")
+    span.italic.indent2
+      | Made with 
+      a(href="https://github.com/jpillora/compilejs",target="_blank") Compile.js

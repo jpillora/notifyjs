@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Notify.js</title>
+    <meta name="description" content="Notify.js - A simple, versatile notification library">
+    <meta name="author" content="Jaime Pillora &lt;dev@jpillora.com&gt;">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="docs/css/app.css">
+    <link href="http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700,800" rel="stylesheet" type="text/css"><!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  </head>
+  <body><a href="https://github.com/jpillora/notifyjs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+    <div class="main container">
+      <div class="eight columns">
+        <h1 class="title">Notify.js</h1>
+      </div>
+      <div class="eight columns right"><span>
+          <iframe src="http://ghbtns.com/github-btn.html?user=jpillora&amp;type=follow" allowtransparency="true" frameborder="0" scrolling="0" width="130" height="20"></iframe></span><span>
+          <iframe src="http://ghbtns.com/github-btn.html?user=jpillora&amp;repo=notifyjs&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="80" height="20"></iframe></span><span><a href="https://twitter.com/share" data-url="http://notifyjs.com" data-text="Notify.js - A simple, versatile notification library" data-hashtags="notifyjs" class="twitter-share-button">Tweet</a>
+          <script>
+            !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+            
+          </script></span></div>
+      <hr>
+      <div class="eight columns summary">
+        <h3>Summary</h3>
+        <p>
+          Notify.js is a jQuery plugin to provide simple yet fully customisable notifications.
+          The javascript code snippets in this documentation with the <code>green</code> edge are runnable by clicking them.
+        </p>
+        <p>
+          <pre class="prettyprint runnable">$.notify("Hello World");</pre>
+        </p><img src="docs/img/pointer.png" class="demo-mouse">
+      </div>
+      <div class="eight columns">
+        <h3>Download</h3>
+        <p>Download pre-packaged with the Bootstrap notification style:<br><a href="dist/notify-combined.min.js" data-download data-name="notify.min">
+            <button>Download notify.min.js</button></a><a href="dist/notify-combined.js" data-download data-name="notify">
+            <button>Download notify.js</button></a></p>
+        <p>Or, create a custom build with your own style<br>
+          <button disabled="disabled" class="build-tool-loading">Loading...</button>
+          <button class="build-tool-toggle">Build a custom notify.js</button>
+        </p>
+      </div>
+      <div ng-app ng-controller="BuildController" class="sixteen columns build-tool">
+        <p class="center">Notify.js Core 
+          <button disabled="disabled" class="active">Include</button>
+        </p>
+        <hr>
+        <p><span class="bold">Styles </span><br>
+          <div ng-repeat="style in styles" class="build-tool-style">
+            <div>
+              <textarea ng-model="style.code" class="code"></textarea>
+            </div>
+            <div class="right">
+              <button ng-click="active(style,'active')" ng-class="style.active &amp;&amp; 'active'">Include</button>
+              <button ng-click="useDefault(style)" ng-class="settings.default == style &amp;&amp; 'active'">Default</button>
+              <button ng-click="test($event,style)" class="test">Test</button>
+              <button ng-click="delete($index)">Delete</button>
+            </div>
+          </div>
+          <div class="build-tool-controls center">
+            <button ng-click="addStyle()">Add Style</button>
+            <select ng-options="p.name for p in premadeStyles" ng-model="toLoad"></select>
+            <button ng-click="loadStyle()">Load Style</button><span class="italic">Contribute more styles !</span>
+          </div>
+        </p>
+        <hr>
+        <p class="center">Minify 
+          <button ng-click="active(settings,'minify')" ng-class="settings.minify &amp;&amp; 'active'">Minify this build</button>
+        </p>
+        <hr>
+        <p class="center">
+          <button ng-click="build()" ng-bind="building &amp;&amp; 'Building...' || 'Download this build'"></button><span class="italic indent2">Made with <a href="https://github.com/jpillora/compilejs" target="_blank">Compile.js</a></span>
+        </p>
+      </div>
+      <div class="sixteen columns">
+        <h3>Basic Usage</h3>
+      </div>
+      <div class="eight columns">
+        <h4>Element Notifications</h4>
+        <p>You can place notifications on any element:</p>
+        <p>
+          <pre class="prettyprint runnable">$(".elem-demo").notify("Hello Box");</pre>
+        </p>
+        <p class="center">Like this <span class="box elem-demo">box</span></p>
+      </div>
+      <div class="eight columns">
+        <h4>Global Notifications</h4>
+        <p>
+           
+          If you don't specify an element, notification
+          will appear in the top left (unless you specify a
+          different position - See <a data-highlight>Positioning</a>)
+        </p>
+        <p>
+          <pre class="prettyprint runnable">$.notify("I'm over here !");</pre>
+        </p>
+      </div>
+      <div class="sixteen columns">
+        <h4>Notification Styles</h4>
+        <p>
+          Each style may define a set of classes to use to substyle the notification.
+          The pre-packaged version includes a bootstrap notification style (see more below in Styling).
+          These classes include:
+          
+        </p>
+        <div><span>Success</span>
+          <pre class="prettyprint runnable indent1">$.notify("Access granted", "success");</pre><span>Info</span>
+          <pre class="prettyprint runnable indent1">$.notify("Do not press this button", "info");</pre><span>Warning</span>
+          <pre class="prettyprint runnable indent1">$.notify("Warning: Self-destruct in 3.. 2..", "warn");</pre><span>Error</span>
+          <pre class="prettyprint runnable indent1">$.notify("BOOM!", "error");</pre>
+        </div>
+        <p style="margin-top:10px" class="italic">Note: This page has set the default class to<code>"success"</code> with<code>$.notify.defaults({ className: "success" });</code>.</p>
+      </div>
+      <div id="position" class="sixteen columns">
+        <h3>Positioning</h3>
+        <p>
+          Element notifications and Global notifications can
+          be vertically repositioned to: <code>"top"</code>, <code>"middle" </code>or <code>"bottom" </code>and horozontally repositioned to: <code>"left"</code>, <code>"center" </code>or <code>"right" </code>.
+        </p>
+        <p>
+          <pre class="prettyprint runnable">$(".pos-demo").notify(
+  "I'm left of the box", 
+  { position:"left" }
+);</pre>
+        </p>
+        <p class="center">We can position the notification around this <span class="box pos-demo">box</span></p>
+        <p style="padding-top: 30px">Use this positioning tool to see all possible position combinations </p>
+        <div style="padding: 30px;">
+          <label for="pos-elem" class="inline">Element</label>
+          <input type="radio" id="pos-elem" value="elem" name="pos-type" checked="checked">
+          <label for="pos-glob" class="inline">Global</label>
+          <input type="radio" id="pos-glob" value="glob" name="pos-type">
+        </div>
+        <div style="margin-left: 60px">
+          <input data-thickness=".3" data-width="100" data-height="100" data-max="12" data-cursor="true" data-fgColor="#080" data-displayInput="false" data-angleOffset="-15" data-linecap="round" class="pos-chooser">
+        </div>
+        <p class="center"><span>An awesome cool </span><span class="box pos-chooser-demo">larrrggggeeee box</span></p>
+      </div>
+      <div class="sixteen columns">
+        <h3>API</h3>
+        <div class="entry">
+          <h5><code class="black">$.notify( </code><code>string|object</code><code class="black">, [ </code><code>options</code><code class="black"> ])</code></h5>
+          <p class="indent1"><code>string|object</code> - global notification data<br><code>options</code> - an options object or class name string </p>
+        </div>
+        <div class="entry">
+          <h5><code class="black">$.notify( </code><code>element</code><code class="black">, </code><code>string|object</code><code class="black">, [ </code><code>options</code><code class="black"> ])</code></h5>
+          <p class="indent1"><code>element</code> - a jquery element<br><code>string|object</code> - element notification data<br><code>options</code> - an options object or class name string </p>
+        </div>
+        <div class="entry">
+          <h5><code class="black">$( </code><code>selector</code><code class="black"> ).notify( </code><code>string|object</code><code class="black">, [ </code><code>options</code><code class="black"> ])</code></h5>
+          <p class="indent1"><code>selector</code> - jquery selector<br><code>string|object</code> - element notification data<br><code>options</code> - an options object or class name string </p>
+        </div>
+        <div class="entry">
+          <h5><code class="black">$.notify.addStyle( </code><code>styleName</code><code class="black">, </code><code>styleDefinition</code><code class="black"> )</code></h5>
+          <p class="indent1"><code>styleName</code> - string (the  <b>style</b> option references this name)<br> <code>styleDefinition</code> - style definition object (see <b>Styling</b> below)</p>
+        </div>
+        <div class="entry">
+          <h5><code class="black">$.notify.defaults( </code><code>options</code><code class="black"> )</code></h5>
+          <p class="indent1"><code>options</code> - an options object (updates the defaults listed below) </p>
+        </div>
+      </div>
+      <div class="sixteen columns">
+        <h3>Options</h3>
+        <p>
+           
+          The options object listed above are in the form below.
+          This object below is the actual used to check option
+          validity and set defaults.  
+        </p>
+        <pre class="prettyprint">{
+  // whether to hide the notification on click
+  clickToHide: true,
+  // whether to auto-hide the notification
+  autoHide: true,
+  // if autoHide, hide after milliseconds
+  autoHideDelay: 5000,
+  // show the arrow pointing at the element
+  arrowShow: true,
+  // arrow size in pixels
+  arrowSize: 5,
+  // default positions
+  elementPosition: 'bottom left',
+  globalPosition: 'top right',
+  // default style
+  style: 'bootstrap',
+  // default class (string or [string])
+  className: 'error',
+  // show animation
+  showAnimation: 'slideDown',
+  // show animation duration
+  showDuration: 400,
+  // hide animation
+  hideAnimation: 'slideUp',
+  // hide animation duration
+  hideDuration: 200,
+  // padding between element and notification
+  gap: 2
+}
+</pre>
+      </div>
+      <div class="sixteen columns">
+        <div class="section">
+          <h3>Custom Styling Guide</h3>
+          <p>You can add your own styles to Notify.js with the<code>$.notify.addStyle </code>method. See  <a data-highlight>API</a>.</p>
+          <p>Style definition objects are in the form:</p>
+          <pre class="prettyprint">{
+  //required html representing each notification 
+  html: "",
+  //optional object to be converted to css
+  classes: {
+    &lt;className&gt;: {
+      &lt;propertyName&gt;: &lt;value&gt; 
+    },
+    &lt;className&gt;: {
+      ...
+    },
+    ...
+  },
+  //optional css to be inserted onto the page
+  css: ""
+}
+</pre>
+          <p>
+            <h5 class="inline">html</h5> - If you only have HTML element that you need to modify per
+            notification then you should give this element an attribute of <code>data-notify-text</code> or <code>data-notify-html</code>. Use <code>data-notify-html</code> if you wish to display arbitrary HTML inside the notification,
+             otherwise, use <code>data-notify-text</code> as it is more secure.<br> Otherwise, if you wish to modify multiple HTML elements per
+            notification then you'll need to give each element one of the two
+            attributes above <b>as well as a value</b>. For an example of this see the Advanced Example below.
+          </p>
+          <p>
+            <h5 class="inline">classes</h5> - This object will be used to construct css. It must be in the form described above and there is an example below.
+          </p>
+          <p>
+            <h5 class="inline">css</h5> - This string is simply raw css. Use this property if you want to keep your style definition inside
+             your js files.
+          </p>
+        </div>
+        <div class="section">
+          <h4>Class naming convention</h4>
+          <p>
+            When each notification is constructed, it's container 
+            (outer most element defined in your style html) will automatically 
+            apply the class:
+          </p>
+          <p><code>notifyjs-&lt;style name&gt;-base</code></p>
+          <p>
+             
+            When you use the class name option (<code>className</code>) the class:
+          </p>
+          <p><code>notifyjs-&lt;style name&gt;-&lt;class name&gt;</code></p>
+          <p>
+            will be applied. So if you define your styles in an external CSS file or in the style's css
+            property, you must define your CSS rules using this naming convention.
+            
+          </p>
+        </div>
+        <div class="section">
+          <h4>Simple Example</h4>
+          <p>If you were to define the style:</p>
+          <pre class="prettyprint auto-run happyblue-example">$.notify.addStyle('happyblue', {
+  html: "&lt;div&gt;☺&lt;span data-notify-text/&gt;☺&lt;/div&gt;",
+  classes: {
+    base: {
+      "white-space": "nowrap",
+      "background-color": "lightblue",
+      "padding": "5px"
+    },
+    superblue: {
+      "color": "white",
+      "background-color": "blue"
+    }
+  }
+});
+</pre>
+          <p>Upon running this code, the <code>classes</code> object in this example will be converted the following css:</p>
+          <pre class="prettyprint lang-css">.notifyjs-happyblue-base {
+  white-space: nowrap;
+  background-color: lightblue;
+  padding: 5px;
+}
+.notifyjs-happyblue-superblue {
+  color: white;
+  background-color: blue;
+}</pre>
+          <p:i>You can confirm this now by inspecting the DOM (look for the tagged style element in the head)</p:i>
+          <p>You can now use your new style with:</p>
+          <pre class="prettyprint runnable">$.notify('hello !!', {
+  style: 'happyblue'
+});
+</pre>
+          <p>
+             
+            and you can use the <code>superblue</code> class with:
+          </p>
+          <pre class="prettyprint runnable">$.notify('HELLO !!!!', {
+  style: 'happyblue',
+  className: 'superblue'
+});
+</pre>
+        </div>
+        <div class="section">
+          <h4>Advanced Example</h4>
+          <p>Say you wanted to use buttons in your notifications then you could do something like:</p>
+          <pre class="prettyprint auto-run button-js-example">//add a new style 'foo'
+$.notify.addStyle('foo', {
+  html: 
+    "&lt;div&gt;" +
+      "&lt;div class='clearfix'&gt;" +
+        "&lt;div class='title' data-notify-html='title'/&gt;" +
+        "&lt;div class='buttons'&gt;" +
+          "&lt;button class='no'&gt;Cancel&lt;/button&gt;" +
+          "&lt;button class='yes' data-notify-text='button'&gt;&lt;/button&gt;" +
+        "&lt;/div&gt;" +
+      "&lt;/div&gt;" +
+    "&lt;/div&gt;"
+});
+
+//listen for click events from this style
+$(document).on('click', '.notifyjs-foo-base .no', function() {
+  //programmatically trigger propogating hide event
+  $(this).trigger('notify-hide');
+});
+$(document).on('click', '.notifyjs-foo-base .yes', function() {
+  //show button text
+  alert($(this).text() + " clicked!");
+  //hide notification
+  $(this).trigger('notify-hide');
+});
+</pre>
+          <p>
+             
+            Notice there is no <code>classes</code> property defined above. Since the CSS in this example is non-trivial, we'll use an exteral CSS file instead:
+          </p>
+          <p class="italic">Note: you could also convert this CSS code to a JavaScript string and use it with the <code>css</code> property. It's not very readable though it's better for distribution.</p>
+          <pre class="prettyprint auto-add foo-css-example lang-css">.notifyjs-foo-base {
+  opacity: 0.85;
+  width: 200px;
+  background: #F5F5F5;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.notifyjs-foo-base .title {
+  width: 100px;
+  float: left;
+  margin: 10px 0 0 10px;
+  text-align: right;
+}
+
+.notifyjs-foo-base .buttons {
+  width: 70px;
+  float: right;
+  font-size: 9px;
+  padding: 5px;
+  margin: 2px;
+}
+
+.notifyjs-foo-base button {
+  font-size: 9px;
+  padding: 5px;
+  margin: 2px;
+  width: 60px;
+}
+</pre>
+          <p>You can now use this style with:</p>
+          <pre class="prettyprint runnable">$.notify({
+  title: 'Would you like some Foo ?',
+  button: 'Confirm'
+}, { 
+  style: 'foo',
+  autoHide: false,
+  clickToHide: false
+});
+</pre>
+        </div>
+        <div class="section">
+          <h4>Extra Example</h4>
+          <p>
+            If using the above methods still don't provide you
+            with what you need then you can, pass jQuery objects
+            straight into the notification (provided that the
+            element has the <code>data-notify-html</code> attribute):
+            
+          </p>
+          <pre class="prettyprint runnable">var h5 = $("&lt;h5/&gt;").append("You MUST have some Foo !")
+
+$.notify({
+  title: h5,
+  button: 'YES !'
+}, { 
+  style: 'foo',
+  autoHide: false,
+  clickToHide: false
+});
+</pre>
+        </div>
+        <div class="section">
+          <h4>Style List</h4>
+          <p><span>Currently there is only one style available</span>
+            <ul class="square">
+              <li><a href="../../notifyjs/dist/styles/notify-bootstrap.js" target="_blank">notify-bootstrap.js</a></li>
+            </ul>
+          </p>
+        </div>
+      </div>
+      <div class="sixteen columns">
+        <h3>Contributing More Styles </h3>
+        <p>
+           
+          Contributing more styles is easy!
+          <ol>
+            <li>Click <a href="https://github.com/jpillora/notifyjs/new/master/src/styles" target="_blank">this</a> link</li>
+            <li>Sign into GitHub (if you're not already)</li>
+            <li>Click 'Fork'</li>
+            <li>Enter your new style</li>
+            <li>Click 'Commit New File'</li>
+            <li>Click 'Send Pull Request'!</li>
+          </ol>
+        </p>
+        <p>To get people started with some styles ideas, checkout this <a href="http://mac.appstorm.net/roundups/utilities-roundups/36-sweet-growl-styles-to-keep-your-notifications-snappy/" target="_blank">post on various Growl styles</a>.</p>
+        <p class="italic">
+          Note: If you wish to contribute to the library by fixing bugs or adding features,
+          see the <b>src</b> folder. Also, the source is in CoffeeScript, however, new styles can be either JavaScript or CoffeeScript.
+           I'm using <a href="https://gruntjs.com" target="_blank">Grunt </a> to compile, minify and concat the builds, you can do so with:
+          <ol>
+            <li>Fork <a href="https://github.com/jpillora/notifyjs">https://github.com/jpillora/notifyjs</a></li>
+            <li><code>cd notifyjs</code></li>
+            <li><code>npm install -g grunt-cli</code></li>
+            <li><code>npm install</code></li>
+            <li><code>grunt</code></li>
+            <li>Pull-request ! </li>
+          </ol>
+        </p>
+      </div>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+    <script src="dist/notify.js"></script>
+    <script src="dist/styles/notify-bootstrap.js" id="bootstrap-style"></script>
+    <script src="docs/js/app.js"></script>
+    <script defered src="http://jpillora.com/compilejs/dist/compile.js"></script>
+    <script defered src="http://jpillora.com/compilejs/dist/tasks/compile.uglify.js"></script>
+    <script defered src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.4/angular.min.js"></script>
+    <script>
+      //async fonts
+      WebFontConfig = { google: { families: [ 'Droid+Sans+Mono::latin' ] } };
+      (function() {
+        var wf = document.createElement('script');
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+          '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+      })();
+      //ga
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-38709761-6', 'notifyjs.com');
+      ga('send', 'pageview');
+      
+      
+    </script>
+  </body>
+</html>

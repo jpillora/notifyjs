@@ -1,0 +1,55 @@
+
+//- ====================================
+//-  POSITIONING
+//- ====================================
+.sixteen.columns(id="position")
+  h3 Positioning
+
+  p
+    | Element notifications and Global notifications can
+    | be vertically repositioned to: 
+    code "top"
+    | , 
+    code "middle" 
+    | or 
+    code "bottom" 
+    | and horozontally repositioned to: 
+    code "left"
+    | , 
+    code "center" 
+    | or 
+    code "right" 
+    | .
+
+  p: pre.prettyprint.runnable
+    | $(".pos-demo").notify(
+    |   "I'm left of the box", 
+    |   { position:"left" }
+    | );
+
+  p.center
+    | We can position the notification around this 
+    span.box.pos-demo box
+
+  p(style='padding-top: 30px') Use this positioning tool to see all possible position combinations 
+
+  div(style="padding: 30px;")
+    label.inline(for="pos-elem") Element
+    input(type="radio", id="pos-elem", value="elem", name="pos-type", checked="checked")
+    label.inline(for="pos-glob") Global
+    input(type="radio", id="pos-glob", value="glob", name="pos-type")
+
+  div(style="margin-left: 60px")
+    input.pos-chooser(data-thickness=".3",
+                      data-width='100',
+                      data-height='100',
+                      data-max="12",
+                      data-cursor="true",
+                      data-fgColor='#080',
+                      data-displayInput="false",
+                      data-angleOffset='-15',
+                      data-linecap='round')
+  p.center
+    span An awesome cool 
+    span.box.pos-chooser-demo larrrggggeeee box
+
