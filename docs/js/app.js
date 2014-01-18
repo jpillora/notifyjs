@@ -737,7 +737,7 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
 
   App = window.App = App || {};
 
-  window.BuildController = function($scope) {
+  window.BuildController = function($scope, $timeout) {
     var elem, getStyleName;
     $scope.premadeStyles = [
       {
@@ -766,7 +766,6 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
         premade: premade
       });
     };
-    $scope.addStyle($(".happyblue-example").text());
     $scope.settings = {
       minify: false,
       "default": $scope.styles[0]
@@ -777,6 +776,7 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
       if (!style) {
         return;
       }
+      $scope.premadeStyle = null;
       baseUrl = "dist/styles/" + style.name + "/notify-" + style.name;
       $.ajax({
         url: "" + baseUrl + ".js",
@@ -799,6 +799,8 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
         }
       });
     };
+    $scope.premadeStyle = $scope.premadeStyles[0];
+    $scope.loadStyle;
     $scope.toggle = function() {
       $(".build-tool-toggle").toggleClass('active');
       return $(".build-tool").toggle(400);
@@ -825,7 +827,7 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
       return m[1];
     };
     $scope.test = function(event, style, global) {
-      var className, classes, code, contentText, e, name, notifyStyle, obj, rand, testBtn;
+      var className, classes, code, contentText, e, name, notifyStyle, obj, rand, testBtn, _ref;
       testBtn = $(event.target);
       contentText = testBtn.parent().parent().find('.code');
       code = style.code;
@@ -856,7 +858,7 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
       rand = Math.floor(Math.random() * classes.length);
       className = classes[rand];
       obj = className === 'base' ? 'no class' : "'" + className + "'";
-      if (style.premade) {
+      if ((_ref = style.premade) != null ? _ref.test : void 0) {
         obj = style.premade.test(obj);
       }
       try {

@@ -1,7 +1,7 @@
 
 App = window.App = App or {}
 
-window.BuildController = ($scope) ->
+window.BuildController = ($scope,$timeout) ->
 
   $scope.premadeStyles = [
     { 
@@ -19,18 +19,15 @@ window.BuildController = ($scope) ->
     }
   ]
 
+
   $(".build-tool-loading").hide()
   $(".build-tool-toggle").show()
 
   App.buildTool = $scope
 
   $scope.styles = []
-
   $scope.addStyle = (code, premade) ->
     $scope.styles.push { active: true, code, premade:premade }
-
-  #use one of the examples
-  $scope.addStyle $(".happyblue-example").text()
 
   $scope.settings = {
     minify: false
@@ -38,11 +35,9 @@ window.BuildController = ($scope) ->
   }
 
   $scope.loadStyle = ->
-
     style = $scope.premadeStyle
-
     return unless style
-
+    $scope.premadeStyle = null
     baseUrl = "dist/styles/#{style.name}/notify-#{style.name}"
 
     $.ajax
@@ -61,6 +56,10 @@ window.BuildController = ($scope) ->
           $scope.addStyle js, style
           $scope.$digest()
     return
+
+  #load bootstrap
+  $scope.premadeStyle = $scope.premadeStyles[0]
+  $scope.loadStyle
 
   #angular has loaded
   $scope.toggle = ->
@@ -123,7 +122,7 @@ window.BuildController = ($scope) ->
 
     obj = if className is 'base' then 'no class' else "'#{className}'"
 
-    if style.premade
+    if style.premade?.test
       obj = style.premade.test obj
 
     try
