@@ -329,9 +329,7 @@ class Notification
 
 
   setGlobalPosition: () ->
-    position = @getPosition()
-
-    [pMain, pAlign] = position
+    [pMain, pAlign] = @getPosition()
 
     main = positions[pMain]
     align = positions[pAlign]
@@ -481,7 +479,7 @@ class Notification
       $.extend @options, options
     #shortcut special case
     else if $.type(options) is 'string'
-      @options.color = options
+      @options.className = options
 
     if @container and not data
       @show false

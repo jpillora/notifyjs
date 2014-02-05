@@ -1,6 +1,6 @@
-/** Notify.js - v0.3.1 - 2013/07/05
+/** Notify.js - v0.3.1 - 2014/02/06
  * http://notifyjs.com/
- * Copyright (c) 2013 Jaime Pillora - MIT
+ * Copyright (c) 2014 Jaime Pillora - MIT
  */
 (function(window,document,$,undefined) {
 'use strict';
@@ -303,9 +303,8 @@ Notification = (function() {
   };
 
   Notification.prototype.setGlobalPosition = function() {
-    var align, anchor, css, key, main, pAlign, pMain, position;
-    position = this.getPosition();
-    pMain = position[0], pAlign = position[1];
+    var align, anchor, css, key, main, pAlign, pMain, _ref;
+    _ref = this.getPosition(), pMain = _ref[0], pAlign = _ref[1];
     main = positions[pMain];
     align = positions[pAlign];
     key = pMain + "|" + pAlign;
@@ -451,7 +450,7 @@ Notification = (function() {
     if ($.isPlainObject(options)) {
       $.extend(this.options, options);
     } else if ($.type(options) === 'string') {
-      this.options.color = options;
+      this.options.className = options;
     }
     if (this.container && !data) {
       this.show(false);

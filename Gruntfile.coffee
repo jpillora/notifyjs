@@ -34,7 +34,7 @@ module.exports = (grunt) ->
 
     concat:
       combined:
-        src: ['dist/<%= pkg.name %>.js', 'dist/styles/*.js']
+        src: ['dist/<%= pkg.name %>.js', 'dist/styles/bootstrap/<%= pkg.name %>-bootstrap.js']
         dest: 'dist/<%= pkg.name %>-combined.js'
 
     uglify:

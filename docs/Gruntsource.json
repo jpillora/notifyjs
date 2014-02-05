@@ -1,6 +1,6 @@
 {
   "source": "~/.grunt-sources/web",
-  "repo": "https://github.com/jpillora/grunt-source-web.git",
+  "repo": "https://github.com/jpillora/grunt-source-web",
   "output": {
     "html": "../index.html"
   }
