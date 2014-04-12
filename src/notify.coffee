@@ -216,6 +216,10 @@ createElem = (tag) ->
 # references to global anchor positions
 globalAnchors = {}
 
+# method to clear globalANchors
+clearAnchors = ->
+  globalAnchors = {}
+
 #gets first on n radios, and gets the fancy stylised input for hidden inputs
 getAnchorElement = (element) ->
   #choose the first of n radios
@@ -551,7 +555,7 @@ $.fn[pluginName] = (data, options) ->
   @
 
 #extra methods
-$.extend $[pluginName], { defaults, addStyle, pluginOptions, getStyle, insertCSS }
+$.extend $[pluginName], { defaults, addStyle, pluginOptions, getStyle, insertCSS, clearAnchors }
 
 #when ready
 $ ->
