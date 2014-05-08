@@ -1,11 +1,11 @@
-/** Notify.js - v0.3.1 - 2014/02/06
+/** Notify.js - v0.3.1 - 2014/05/08
  * http://notifyjs.com/
  * Copyright (c) 2014 Jaime Pillora - MIT
  */
 (function(window,document,$,undefined) {
 'use strict';
 
-var Notification, addStyle, blankFieldName, coreStyle, createElem, defaults, encode, find, findFields, getAnchorElement, getStyle, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
+var Notification, addStyle, blankFieldName, coreStyle, createElem, defaults, encode, find, findFields, getAnchorElement, getScrollBarWidth, getStyle, globalAnchors, hAligns, half, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 pluginName = 'notify';
@@ -150,6 +150,26 @@ find = function(elem, selector) {
   } else {
     return elem.find(selector);
   }
+};
+
+getScrollBarWidth = function() {
+  var fakeScrollBar, w1, w2, width;
+  width = 0;
+  if ($(document).height() > $(window).height()) {
+    $('body').append('<div id="fakescrollbar" style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"></div>');
+    fakeScrollBar = $('#fakescrollbar');
+    fakeScrollBar.append('<div style="height:100px;">&nbsp;</div>');
+    w1 = fakeScrollBar.find('div').innerWidth();
+    fakeScrollBar.css('overflow-y', 'scroll');
+    w2 = $('#fakescrollbar').find('div').html('html is required to init new width.').innerWidth();
+    fakeScrollBar.remove();
+    width = w1 - w2 - 5;
+  }
+  return width;
+};
+
+half = function(num) {
+  return num / 2;
 };
 
 pluginOptions = {
@@ -303,27 +323,33 @@ Notification = (function() {
   };
 
   Notification.prototype.setGlobalPosition = function() {
-    var align, anchor, css, key, main, pAlign, pMain, _ref;
+    var align, anchor, anchorFlag, css, key, main, obj, pAlign, pMain, xAnchorPos, _ref;
     _ref = this.getPosition(), pMain = _ref[0], pAlign = _ref[1];
     main = positions[pMain];
     align = positions[pAlign];
     key = pMain + "|" + pAlign;
     anchor = globalAnchors[key];
-    if (!anchor) {
+    anchorFlag = anchor;
+    if (!anchorFlag) {
       anchor = globalAnchors[key] = createElem("div");
+      anchor.addClass("" + pluginClassName + "-corner");
+      $("body").append(anchor);
+    }
+    obj = anchor.prepend(this.wrapper);
+    if (!anchorFlag) {
       css = {};
       css[main] = 0;
       if (align === 'middle') {
         css.top = '45%';
       } else if (align === 'center') {
-        css.left = '45%';
+        xAnchorPos = half($(document).width()) - half(this.container.width()) - getScrollBarWidth();
+        css.left = "" + xAnchorPos + "px";
       } else {
         css[align] = 0;
       }
-      anchor.css(css).addClass("" + pluginClassName + "-corner");
-      $("body").append(anchor);
+      anchor.css(css);
     }
-    return anchor.prepend(this.wrapper);
+    return obj;
   };
 
   Notification.prototype.setElementPosition = function() {
