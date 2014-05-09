@@ -174,6 +174,25 @@ findFields = (type, elem, fields) ->
 find = (elem, selector) ->
   if elem.is(selector) then elem else elem.find selector
 
+# Helper function to calculate width of the scrollbar
+# Original author: <Damodar Bashyal> @dbashyal
+# Adapted with little modification from http://dltr.org/blog/javascript/509/jQuery-get-browser-width-including-scrollBar
+getScrollBarWidth = () ->
+  width = 0
+  if $(document).height() > $(window).height()
+    $('body').append('<div id="fakescrollbar" style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"></div>')
+    fakeScrollBar = $('#fakescrollbar')
+    fakeScrollBar.append('<div style="height:100px;">&nbsp;</div>')
+    w1 = fakeScrollBar.find('div').innerWidth()
+    fakeScrollBar.css('overflow-y', 'scroll')
+    w2 = $('#fakescrollbar').find('div').html('html is required to init new width.').innerWidth()
+    fakeScrollBar.remove()
+    width = w1-w2-5
+  width
+    
+half = (num) ->
+  return num / 2
+
 # ================================
 #  OPTIONS
 # ================================
@@ -336,20 +355,28 @@ class Notification
 
     key = pMain+"|"+pAlign
     anchor = globalAnchors[key]
-    unless anchor
+    anchorFlag = anchor
+    
+    unless anchorFlag
       anchor = globalAnchors[key] = createElem("div")
+      anchor.addClass("#{pluginClassName}-corner")
+      $("body").append anchor
+    
+    obj = anchor.prepend @wrapper
+    
+    unless anchorFlag
       css = {}
       css[main] = 0
       if align is 'middle'
         css.top = '45%'
       else if align is 'center'
-        css.left = '45%'
+        xAnchorPos = half($(document).width()) - half(@container.width()) - getScrollBarWidth()
+        css.left = "#{xAnchorPos}px"
       else
         css[align] = 0
-      anchor.css(css).addClass("#{pluginClassName}-corner")
-      $("body").append anchor
+      anchor.css(css)
 
-    anchor.prepend @wrapper
+    obj
 
   setElementPosition: () ->
     position = @getPosition()
