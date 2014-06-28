@@ -758,17 +758,22 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
     $(".build-tool-loading").hide();
     $(".build-tool-toggle").show();
     App.buildTool = $scope;
+    $scope.settings = {
+      minify: false,
+      "default": null
+    };
     $scope.styles = [];
     $scope.addStyle = function(code, premade) {
-      return $scope.styles.push({
+      var style;
+      style = {
         active: true,
         code: code,
         premade: premade
-      });
-    };
-    $scope.settings = {
-      minify: false,
-      "default": $scope.styles[0]
+      };
+      $scope.styles.push(style);
+      if (!$scope.settings["default"]) {
+        return $scope.settings["default"] = style;
+      }
     };
     $scope.loadStyle = function() {
       var baseUrl, style;
@@ -800,7 +805,7 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
       });
     };
     $scope.premadeStyle = $scope.premadeStyles[0];
-    $scope.loadStyle;
+    $scope.loadStyle();
     $scope.toggle = function() {
       $(".build-tool-toggle").toggleClass('active');
       return $(".build-tool").toggle(400);
@@ -817,6 +822,9 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
     };
     getStyleName = function(style) {
       var m;
+      if (!(style != null ? style.code : void 0)) {
+        return null;
+      }
       m = style.code.match(/\$\.notify\.addStyle\('(["\w-]+)'/);
       if (!m) {
         m = style.code.match(/\$\.notify\.addStyle\("(['\w-]+)"/);
@@ -959,7 +967,19 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
     }, 30 * 1000);
     $(document).on('click', '.prettyprint.runnable', runSnippet);
     $(".prettyprint.auto-run").each(runSnippet);
-    return $(".prettyprint.auto-add").each(addCSS);
+    $(".prettyprint.auto-add").each(addCSS);
+    $.notify.addStyle('gswg', {
+      html: "<div>\n  <div class=\"content clearfix\">\n    <div class=\"cover\"></div>\n    <div class=\"text\">\n      <div>Read my book:</div>\n      <div class=\"title\">Getting Started with Grunt: The JavaScript Task Runner</div>\n      <div>Get the first chapter for free!</div>\n      <div>\n        <a target=\"_blank\" href=\"http://gswg.io\">\n          <button data-notify-text></button>\n        </a>\n        <button>No thanks</button>\n      </div>\n    </div>\n  </div>\n</div>"
+    });
+    $(document).on('click', '.notifyjs-gswg-base button', function() {
+      return $(this).trigger('notify-hide');
+    });
+    return $.notify("http://gswg.io", {
+      position: 'b r',
+      style: 'gswg',
+      autoHide: false,
+      clickToHide: false
+    });
   };
 
   App = App || {};

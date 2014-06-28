@@ -35,3 +35,31 @@ App.codeRunner = ->
 
   $(".prettyprint.auto-run").each(runSnippet)
   $(".prettyprint.auto-add").each(addCSS)
+
+  #show gswg ad
+  $.notify.addStyle 'gswg',
+    html: """<div>
+      <div class="content clearfix">
+        <div class="cover"></div>
+        <div class="text">
+          <div>Read my book:</div>
+          <div class="title">Getting Started with Grunt: The JavaScript Task Runner</div>
+          <div>Get the first chapter for free!</div>
+          <div>
+            <a target="_blank" href="http://gswg.io">
+              <button data-notify-text></button>
+            </a>
+            <button>No thanks</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+
+  $(document).on 'click', '.notifyjs-gswg-base button', ->
+    $(this).trigger('notify-hide')
+
+  $.notify("http://gswg.io", {position:'b r', style: 'gswg', autoHide: false, clickToHide: false})
+
+
+

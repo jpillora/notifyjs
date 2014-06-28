@@ -7,8 +7,11 @@
     <meta name="author" content="Jaime Pillora &lt;dev@jpillora.com&gt;">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="docs/css/app.css">
-    <link href="http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700,800" rel="stylesheet" type="text/css"><!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <link href="http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700,800" rel="stylesheet" type="text/css">
+    <!--if lt IE 9
+    script(src='http://html5shim.googlecode.com/svn/trunk/html5.js')
+    
+    -->
   </head>
   <body><a href="https://github.com/jpillora/notifyjs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
     <div class="main container">
@@ -90,7 +93,6 @@
       <div class="eight columns">
         <h4>Global Notifications</h4>
         <p>
-           
           If you don't specify an element, notification
           will appear in the top left (unless you specify a
           different position - See <a data-highlight>Positioning</a>)
@@ -166,7 +168,6 @@
       <div class="sixteen columns">
         <h3>Options</h3>
         <p>
-           
           The options object listed above are in the form below.
           This object below is the actual used to check option
           validity and set defaults.  
@@ -247,10 +248,7 @@
             apply the class:
           </p>
           <p><code>notifyjs-&lt;style name&gt;-base</code></p>
-          <p>
-             
-            When you use the class name option (<code>className</code>) the class:
-          </p>
+          <p>When you use the class name option (<code>className</code>) the class:</p>
           <p><code>notifyjs-&lt;style name&gt;-&lt;class name&gt;</code></p>
           <p>
             will be applied. So if you define your styles in an external CSS file or in the style's css
@@ -292,10 +290,7 @@
   style: 'happyblue'
 });
 </pre>
-          <p>
-             
-            and you can use the <code>superblue</code> class with:
-          </p>
+          <p>and you can use the <code>superblue</code> class with:</p>
           <pre class="prettyprint runnable">$.notify('HELLO !!!!', {
   style: 'happyblue',
   className: 'superblue'
@@ -331,10 +326,7 @@ $(document).on('click', '.notifyjs-foo-base .yes', function() {
   $(this).trigger('notify-hide');
 });
 </pre>
-          <p>
-             
-            Notice there is no <code>classes</code> property defined above. Since the CSS in this example is non-trivial, we'll use an exteral CSS file instead:
-          </p>
+          <p>Notice there is no <code>classes</code> property defined above. Since the CSS in this example is non-trivial, we'll use an exteral CSS file instead:</p>
           <p class="italic">Note: you could also convert this CSS code to a JavaScript string and use it with the <code>css</code> property. It's not very readable though it's better for distribution.</p>
           <pre class="prettyprint auto-add foo-css-example lang-css">.notifyjs-foo-base {
   opacity: 0.85;
@@ -412,9 +404,7 @@ $.notify({
       </div>
       <div class="sixteen columns">
         <h3>Contributing More Styles </h3>
-        <p>
-           
-          Contributing more styles is easy!
+        <p>Contributing more styles is easy!
           <ol>
             <li>Click <a href="https://github.com/jpillora/notifyjs/new/gh-pages/src/styles" target="_blank">this</a> link</li>
             <li>Sign into GitHub (if you're not already)</li>

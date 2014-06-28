@@ -1,4 +1,4 @@
-/** Notify.js - v0.3.1 - 2014/02/06
+/** Notify.js - v0.3.1 - 2014/06/29
  * http://notifyjs.com/
  * Copyright (c) 2014 Jaime Pillora - MIT
  */
@@ -56,7 +56,7 @@ styles = {};
 coreStyle = {
   name: 'core',
   html: "<div class=\"" + pluginClassName + "-wrapper\">\n  <div class=\"" + pluginClassName + "-arrow\"></div>\n  <div class=\"" + pluginClassName + "-container\"></div>\n</div>",
-  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n  margin: 3px;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n  cursor: pointer;\n}\n\n[data-notify-text],[data-notify-html] {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
+  css: "." + pluginClassName + "-corner {\n  position: fixed;\n  margin: 5px;\n  z-index: 1050;\n}\n\n." + pluginClassName + "-corner ." + pluginClassName + "-wrapper,\n." + pluginClassName + "-corner ." + pluginClassName + "-container {\n  position: relative;\n  display: block;\n  height: inherit;\n  width: inherit;\n  margin: 3px;\n}\n\n." + pluginClassName + "-wrapper {\n  z-index: 1;\n  position: absolute;\n  display: inline-block;\n  height: 0;\n  width: 0;\n}\n\n." + pluginClassName + "-container {\n  display: none;\n  z-index: 1;\n  position: absolute;\n}\n\n." + pluginClassName + "-hidable {\n  cursor: pointer;\n}\n\n[data-notify-text],[data-notify-html] {\n  position: relative;\n}\n\n." + pluginClassName + "-arrow {\n  position: absolute;\n  z-index: 2;\n  width: 0;\n  height: 0;\n}"
 };
 
 stylePrefixes = {
@@ -249,6 +249,9 @@ Notification = (function() {
     this.options = inherit(pluginOptions, $.isPlainObject(options) ? options : {});
     this.loadHTML();
     this.wrapper = $(coreStyle.html);
+    if (this.options.clickToHide) {
+      this.wrapper.addClass("" + pluginClassName + "-hidable");
+    }
     this.wrapper.data(pluginClassName, this);
     this.arrow = this.wrapper.find("." + pluginClassName + "-arrow");
     this.container = this.wrapper.find("." + pluginClassName + "-container");
@@ -536,12 +539,12 @@ $.extend($[pluginName], {
 
 $(function() {
   insertCSS(coreStyle.css).attr('id', 'core-notify');
-  return $(document).on('click notify-hide', "." + pluginClassName + "-wrapper", function(e) {
-    var inst;
-    inst = $(this).data(pluginClassName);
-    if (inst && (inst.options.clickToHide || e.type === 'notify-hide')) {
-      return inst.show(false);
-    }
+  $(document).on('click', "." + pluginClassName + "-hidable", function(e) {
+    return $(this).trigger('notify-hide');
+  });
+  return $(document).on('notify-hide', "." + pluginClassName + "-wrapper", function(e) {
+    var _ref;
+    return (_ref = $(this).data(pluginClassName)) != null ? _ref.show(false) : void 0;
   });
 });
 
