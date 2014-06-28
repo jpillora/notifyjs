@@ -59,7 +59,10 @@ App.codeRunner = ->
   $(document).on 'click', '.notifyjs-gswg-base button', ->
     $(this).trigger('notify-hide')
 
-  $.notify("http://gswg.io", {position:'b r', style: 'gswg', autoHide: false, clickToHide: false})
+  setTimeout ->
+    $.notify("http://gswg.io", {position:'b r', style: 'gswg', autoHide: false, clickToHide: false})
+  , 15*1000
+
 
 
 

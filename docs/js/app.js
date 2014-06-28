@@ -974,12 +974,14 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
     $(document).on('click', '.notifyjs-gswg-base button', function() {
       return $(this).trigger('notify-hide');
     });
-    return $.notify("http://gswg.io", {
-      position: 'b r',
-      style: 'gswg',
-      autoHide: false,
-      clickToHide: false
-    });
+    return setTimeout(function() {
+      return $.notify("http://gswg.io", {
+        position: 'b r',
+        style: 'gswg',
+        autoHide: false,
+        clickToHide: false
+      });
+    }, 15 * 1000);
   };
 
   App = App || {};
