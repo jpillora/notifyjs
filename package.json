@@ -1,6 +1,6 @@
 {
   "title": "Notify.js",
-  "name": "notify",
+  "name": "jquery-notify",
   "version": "0.3.2",
   "author": {
     "name": "Jaime Pillora"
