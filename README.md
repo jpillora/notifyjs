@@ -7,6 +7,12 @@ See demos and full documentation at:
 
 ## http://notifyjs.com/
 
+##Bower install
+
+```
+bower install notifyjs
+```
+
 #### MIT License
 
 Copyright © 2013 Jaime Pillora &lt;dev@jpillora.com&gt;
