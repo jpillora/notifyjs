@@ -13,5 +13,6 @@
 		}
 	],
   "homepage": "http://notifyjs.com/",
-  "license": "MIT"
+  "license": "MIT",
+	"main": "dist/notify.js"
 }
