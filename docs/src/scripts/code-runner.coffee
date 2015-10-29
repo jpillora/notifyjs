@@ -42,7 +42,7 @@ App.codeRunner = ->
       <div class="content clearfix">
         <div class="cover"></div>
         <div class="text">
-          <div>Read my book:</div>
+          <div>Checkout</div>
           <div class="title">Getting Started with Grunt: The JavaScript Task Runner</div>
           <div>Get the first chapter for free!</div>
           <div>
@@ -60,9 +60,5 @@ App.codeRunner = ->
     $(this).trigger('notify-hide')
 
   setTimeout ->
-    $.notify("http://gswg.io", {position:'b r', style: 'gswg', autoHide: false, clickToHide: false})
+    $.notify("http://gswg.io", {position:'b r', style: 'gswg', autoHideDelay: 10*1000, clickToHide: false})
   , 15*1000
-
-
-
-

@@ -969,7 +969,7 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
     $(".prettyprint.auto-run").each(runSnippet);
     $(".prettyprint.auto-add").each(addCSS);
     $.notify.addStyle('gswg', {
-      html: "<div>\n  <div class=\"content clearfix\">\n    <div class=\"cover\"></div>\n    <div class=\"text\">\n      <div>Read my book:</div>\n      <div class=\"title\">Getting Started with Grunt: The JavaScript Task Runner</div>\n      <div>Get the first chapter for free!</div>\n      <div>\n        <a target=\"_blank\" href=\"http://gswg.io\">\n          <button data-notify-text></button>\n        </a>\n        <button>No thanks</button>\n      </div>\n    </div>\n  </div>\n</div>"
+      html: "<div>\n  <div class=\"content clearfix\">\n    <div class=\"cover\"></div>\n    <div class=\"text\">\n      <div>Checkout</div>\n      <div class=\"title\">Getting Started with Grunt: The JavaScript Task Runner</div>\n      <div>Get the first chapter for free!</div>\n      <div>\n        <a target=\"_blank\" href=\"http://gswg.io\">\n          <button data-notify-text></button>\n        </a>\n        <button>No thanks</button>\n      </div>\n    </div>\n  </div>\n</div>"
     });
     $(document).on('click', '.notifyjs-gswg-base button', function() {
       return $(this).trigger('notify-hide');
@@ -978,7 +978,7 @@ PR.registerLangHandler(PR.createSimpleLexer([["pln",/^[\t\n\f\r ]+/,null," \t\r\
       return $.notify("http://gswg.io", {
         position: 'b r',
         style: 'gswg',
-        autoHide: false,
+        autoHideDelay: 10 * 1000,
         clickToHide: false
       });
     }, 15 * 1000);

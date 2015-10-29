@@ -13,16 +13,15 @@
     
     -->
   </head>
-  <body><a href="https://github.com/jpillora/notifyjs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
+  <body><a href="https://github.com/notifyjs/notifyjs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
     <div class="main container">
       <div class="eight columns">
         <h1 class="title">Notify.js</h1>
       </div>
       <div class="eight columns right"><span>
-          <iframe src="http://ghbtns.com/github-btn.html?user=jpillora&amp;type=follow" allowtransparency="true" frameborder="0" scrolling="0" width="130" height="20"></iframe></span><span>
-          <iframe src="http://ghbtns.com/github-btn.html?user=jpillora&amp;repo=notifyjs&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="80" height="20"></iframe></span><span><a href="https://twitter.com/share" data-url="http://notifyjs.com" data-text="Notify.js - A simple, versatile notification library" data-hashtags="notifyjs" class="twitter-share-button">Tweet</a>
+          <iframe src="http://ghbtns.com/github-btn.html?user=notifyjs&amp;repo=notifyjs&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="120" height="20"></iframe></span><span><a href="https://twitter.com/share" data-url="http://notifyjs.com" data-text="Notify.js - A simple, versatile notification library" data-hashtags="notifyjs" class="twitter-share-button">Tweet</a>
           <script>
-            !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+            !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
             
           </script></span></div>
       <hr>
@@ -394,10 +393,10 @@ $.notify({
           <h4>Style List</h4>
           <p>
             <ul class="square">
-              <li><a href="https://github.com/jpillora/notifyjs/tree/gh-pages/dist/styles/bootstrap" target="_blank">bootstrap</a></li>
+              <li><a href="https://github.com/notifyjs/notifyjs/tree/gh-pages/dist/styles/bootstrap" target="_blank">bootstrap</a></li>
             </ul>
             <ul class="square">
-              <li><a href="https://github.com/jpillora/notifyjs/tree/gh-pages/dist/styles/metro" target="_blank">metro</a></li>
+              <li><a href="https://github.com/notifyjs/notifyjs/tree/gh-pages/dist/styles/metro" target="_blank">metro</a></li>
             </ul>
           </p>
         </div>
@@ -406,7 +405,7 @@ $.notify({
         <h3>Contributing More Styles </h3>
         <p>Contributing more styles is easy!
           <ol>
-            <li>Click <a href="https://github.com/jpillora/notifyjs/new/gh-pages/src/styles" target="_blank">this</a> link</li>
+            <li>Click <a href="https://github.com/notifyjs/notifyjs/new/gh-pages/src/styles" target="_blank">this</a> link</li>
             <li>Sign into GitHub (if you're not already)</li>
             <li>Click 'Fork'</li>
             <li>Enter your new style</li>
@@ -420,7 +419,7 @@ $.notify({
           see the <b>src</b> folder. Also, the source is in CoffeeScript, however, new styles can be either JavaScript or CoffeeScript.
            I'm using <a href="https://gruntjs.com" target="_blank">Grunt </a> to compile, minify and concat the builds, you can do so with:
           <ol>
-            <li>Fork <a href="https://github.com/jpillora/notifyjs">https://github.com/jpillora/notifyjs</a></li>
+            <li>Fork <a href="https://github.com/notifyjs/notifyjs">https://github.com/notifyjs/notifyjs</a></li>
             <li><code>cd notifyjs</code></li>
             <li><code>npm install -g grunt-cli</code></li>
             <li><code>npm install</code></li>
@@ -430,10 +429,32 @@ $.notify({
         </p>
       </div>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
     <script src="dist/notify.js"></script>
     <script src="dist/styles/bootstrap/notify-bootstrap.js"></script>
     <script src="docs/js/app.js"></script>
-    <script defered src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.4/angular.min.js"></script>
+    <script defered src="http://jpillora.com/compilejs/dist/compile.js"></script>
+    <script defered src="http://jpillora.com/compilejs/dist/tasks/compile.uglify.js"></script>
+    <script defered src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.4/angular.min.js"></script>
+    <script>
+      //async fonts
+      WebFontConfig = { google: { families: [ 'Droid+Sans+Mono::latin' ] } };
+      (function() {
+        var wf = document.createElement('script');
+        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+          '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+        wf.type = 'text/javascript';
+        wf.async = 'true';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wf, s);
+      })();
+      //ga
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-38709761-6', 'notifyjs.com');
+      ga('send', 'pageview');
+    </script>
   </body>
 </html>

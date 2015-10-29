@@ -16,7 +16,7 @@ html(lang='en')
 
   body
 
-    a(href="https://github.com/jpillora/notifyjs")
+    a(href="https://github.com/notifyjs/notifyjs")
       img(style="position: absolute; top: 0; right: 0; border: 0;",
           src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png",
           alt="Fork me on GitHub")
@@ -28,10 +28,8 @@ html(lang='en')
         h1.title Notify.js
 
       .eight.columns.right
-        span: iframe(src="http://ghbtns.com/github-btn.html?user=jpillora&type=follow",
-          allowtransparency="true",frameborder="0",scrolling="0",width="130",height="20")
-        span: iframe(src="http://ghbtns.com/github-btn.html?user=jpillora&repo=notifyjs&type=watch&count=true",
-          allowtransparency="true",frameborder="0",scrolling="0",width="80",height="20")
+        span: iframe(src="http://ghbtns.com/github-btn.html?user=notifyjs&repo=notifyjs&type=watch&count=true",
+          allowtransparency="true",frameborder="0",scrolling="0",width="120",height="20")
         span
           a.twitter-share-button(href='https://twitter.com/share', data-url='http://notifyjs.com', data-text='Notify.js - A simple, versatile notification library', data-hashtags='notifyjs') Tweet
           script.
@@ -56,8 +54,8 @@ html(lang='en')
     script(src="docs/js/app.js")
 
     //- build tool scripts
-    script(defered, src="#{false ? '../' : 'http://jpillora.com/'}compilejs/dist/compile.js")
-    script(defered, src="#{false ? '../' : 'http://jpillora.com/'}compilejs/dist/tasks/compile.uglify.js")
+    script(defered, src="http://jpillora.com/compilejs/dist/compile.js")
+    script(defered, src="http://jpillora.com/compilejs/dist/tasks/compile.uglify.js")
     script(defered, src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.4/angular.min.js")
 
     script.
@@ -79,5 +77,3 @@ html(lang='en')
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
       ga('create', 'UA-38709761-6', 'notifyjs.com');
       ga('send', 'pageview');
-
-

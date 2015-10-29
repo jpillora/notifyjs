@@ -1,10 +1,10 @@
 {
-  "title": "Notify.js",
-  "name": "notify",
-  "version": "0.3.3",
-  "author": {
-    "name": "Jaime Pillora"
-  },
+	"title": "Notify.js",
+	"name": "notify",
+	"version": "0.3.3",
+	"author": {
+		"name": "Jaime Pillora"
+	},
 	"contributors": [
 		{
 			"name": "Evan Carroll"
@@ -12,7 +12,7 @@
 			, "email": "me@evancarroll.com"
 		}
 	],
-  "homepage": "http://notifyjs.com/",
-  "license": "MIT",
+	"homepage": "http://notifyjs.com/",
+	"license": "MIT",
 	"main": "dist/notify.js"
 }
