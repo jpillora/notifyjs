@@ -1,7 +1,3 @@
-/** Notify.js - v0.3.1 - 2014/06/29
- * http://notifyjs.com/
- * Copyright (c) 2014 Jaime Pillora - MIT
- */
 (function(window,document,$,undefined) {
 'use strict';
 
