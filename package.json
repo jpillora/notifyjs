@@ -1,15 +1,15 @@
 {
 	"title": "Notify.js",
 	"name": "notify",
-	"version": "0.3.3",
+	"version": "0.3.4",
 	"author": {
 		"name": "Jaime Pillora"
 	},
 	"contributors": [
 		{
-			"name": "Evan Carroll"
-			, "url": "http://www.evancarroll.com"
-			, "email": "me@evancarroll.com"
+			"name": "Evan Carroll",
+			"url": "http://www.evancarroll.com",
+			"email": "me@evancarroll.com"
 		}
 	],
 	"homepage": "http://notifyjs.com/",

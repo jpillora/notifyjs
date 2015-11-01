@@ -1,8 +1,0 @@
-{
-  "source": "~/.grunt-sources/web",
-  "repo": "https://github.com/jpillora/grunt-source-web.git",
-  "output": {
-    "html": "../index.html"
-  },
-  "angular":true
-}

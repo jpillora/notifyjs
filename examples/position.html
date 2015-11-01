@@ -3,7 +3,6 @@
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
   <script src="../dist/notify.js"></script>
-  <script src="../dist/styles/notify-bootstrap.js"></script>
 
   <style type="text/css">
     .boxes {
@@ -33,7 +32,6 @@
       $.each(positions, function(i, p) {
         var box = $("<div class=\"box\">"+p+"</div>");
         boxes.append($("<div class=\"wrapper\"/>").append(box));
-
         box.notify(p, {position: p+" center"});
       });
 

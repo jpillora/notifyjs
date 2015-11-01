@@ -20,7 +20,7 @@
   <!-- run code -->
   <script class="demo">
 
-    $.notify.defaults({ arrowShow: false })
+    $.notify.defaults({ arrowShow: false, autoHide: false })
 
 
     $.notify.addStyle('single-text', {
@@ -36,9 +36,6 @@
     });
 
     $(function() {
-
-
-
       $(".1").notify({
         title: "HELLO!",
         p1: "little",

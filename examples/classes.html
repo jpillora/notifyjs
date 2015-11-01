@@ -3,9 +3,12 @@
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
   <script src="../dist/notify.js"></script>
-  <script src="../dist/styles/notify-bootstrap.js"></script>
 
   <style type="text/css">
+    html {
+      font-family: Helvetica;
+    }
+
     .boxes {
       margin: 150px;
     }
@@ -25,7 +28,7 @@
   <!-- run code -->
   <script class="demo">
 
-    $.notify.options({
+    $.notify.defaults({
       autoHide: false
     });
 
