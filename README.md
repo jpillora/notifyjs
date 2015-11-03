@@ -20,8 +20,8 @@ Element Notifications
 
     $(".elem-demo").notify("Hello World");
     
-    // where x is one letter: [t]op, [b]ottom, [m]iddle
-    // where y is one letter: [l]eft, [r]ight, [c]enter
+    // where x is one letter: [t]op   [m]iddle  [b]ottom
+    // where y is one letter: [l]eft  [c]enter  [r]ight
     $(".elem-demo").notify("Hello World", {position: "x y"});
 
 COPYRIGHT
