@@ -1,6 +1,7 @@
-// UMD start
-// https://github.com/umdjs/umd/blob/master/jqueryPluginCommonjs.js
+/* Notify.js - http://notifyjs.com/ Copyright (c) 2015 MIT */
 (function (factory) {
+	// UMD start
+	// https://github.com/umdjs/umd/blob/master/jqueryPluginCommonjs.js
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
 		define(['jquery'], factory);
@@ -27,24 +28,28 @@
 		factory(jQuery);
 	}
 }(function ($) {
-	var Notification, addStyle, blankFieldName, coreStyle, createElem, defaults, encode, find, findFields, getAnchorElement, getStyle, globalAnchors, hAligns, incr, inherit, insertCSS, mainPositions, opposites, parsePosition, pluginClassName, pluginName, pluginOptions, positions, realign, stylePrefixes, styles, vAligns,
-		__indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-
-	pluginName = 'notify';
-
-	pluginClassName = pluginName + 'js';
-
-	blankFieldName = pluginName + "!blank";
-
-	positions = {
-		t: 'top',
-		m: 'middle',
-		b: 'bottom',
-		l: 'left',
-		c: 'center',
-		r: 'right'
+	//IE8 indexOf polyfill
+	var indexOf = [].indexOf || function(item) {
+		for (var i = 0, l = this.length; i < l; i++) {
+			if (i in this && this[i] === item) {
+				return i;
+			}
+		}
+		return -1;
 	};
 
+	var pluginName = "notify";
+	var pluginClassName = pluginName + "js";
+	var blankFieldName = pluginName + "!blank";
+
+	var positions = {
+		t: "top",
+		m: "middle",
+		b: "bottom",
+		l: "left",
+		c: "center",
+		r: "right"
+	};
 	var hAligns = ["l", "c", "r"];
 	var vAligns = ["t", "m", "b"];
 	var mainPositions = ["t", "b", "l", "r"];
@@ -593,13 +598,15 @@
 	});
 
 	$(function() {
-		insertCSS(coreStyle.css).attr('id', 'core-notify');
-		$(document).on('click', "." + pluginClassName + "-hidable", function(e) {
-			return $(this).trigger('notify-hide');
+		insertCSS(coreStyle.css).attr("id", "core-notify");
+		$(document).on("click", "." + pluginClassName + "-hidable", function(e) {
+			return $(this).trigger("notify-hide");
 		});
-		return $(document).on('notify-hide', "." + pluginClassName + "-wrapper", function(e) {
-			var _ref;
-			return (_ref = $(this).data(pluginClassName)) != null ? _ref.show(false) : void 0;
+		return $(document).on("notify-hide", "." + pluginClassName + "-wrapper", function(e) {
+			var elem = $(this).data(pluginClassName);
+			if(elem) {
+				elem.show(false);
+			}
 		});
 	});
 
