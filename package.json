@@ -21,5 +21,8 @@
   },
   "dependencies": {
     "jquery": "^2.1.4"
+  },
+  "devDependencies": {
+    "jshint": "^2.8.0"
   }
 }

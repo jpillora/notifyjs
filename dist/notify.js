@@ -92,7 +92,6 @@
 	};
 
 	var addStyle = function(name, def) {
-		var cssText, elem, fields, ref;
 		if (!name) {
 			throw "Missing Style name";
 		}
@@ -102,7 +101,9 @@
 		if (!def.html) {
 			throw "Missing Style HTML";
 		}
-		if ((ref = styles[name]) != null ? ref.cssElem : void 0) {
+		//remove existing style
+		var existing = styles[name];
+		if (existing && existing.cssElem) {
 			if (window.console) {
 				console.warn(pluginName + ": overwriting style '" + name + "'");
 			}
@@ -110,7 +111,7 @@
 		}
 		def.name = name;
 		styles[name] = def;
-		cssText = "";
+		var cssText = "";
 		if (def.classes) {
 			$.each(def.classes, function(className, props) {
 				cssText += "." + pluginClassName + "-" + def.name + "-" + className + " {\n";
@@ -132,11 +133,11 @@
 			def.cssElem = insertCSS(cssText);
 			def.cssElem.attr("id", "notify-" + def.name);
 		}
-		fields = {};
-		elem = $(def.html);
+		var fields = {};
+		var elem = $(def.html);
 		findFields("html", elem, fields);
 		findFields("text", elem, fields);
-		return def.fields = fields;
+		def.fields = fields;
 	};
 
 	var insertCSS = function(cssText) {
@@ -146,8 +147,7 @@
 		$("head").append(elem);
 		try {
 			elem.html(cssText);
-		} catch (error) {
-			e = error;
+		} catch (_) {
 			elem[0].styleSheet.cssText = cssText;
 		}
 		return elem;
@@ -165,7 +165,7 @@
 			if (!name) {
 				name = blankFieldName;
 			}
-			return fields[name] = type;
+			fields[name] = type;
 		});
 	};
 
@@ -330,15 +330,16 @@
 	};
 
 	Notification.prototype.setGlobalPosition = function() {
-		var align, anchor, css, key, main, pAlign, pMain, ref;
-		ref = this.getPosition(), pMain = ref[0], pAlign = ref[1];
-		main = positions[pMain];
-		align = positions[pAlign];
-		key = pMain + "|" + pAlign;
-		anchor = globalAnchors[key];
+		var p = this.getPosition();
+		var pMain = p[0];
+		var pAlign = p[1];
+		var main = positions[pMain];
+		var align = positions[pAlign];
+		var key = pMain + "|" + pAlign;
+		var anchor = globalAnchors[key];
 		if (!anchor) {
 			anchor = globalAnchors[key] = createElem("div");
-			css = {};
+			var css = {};
 			css[main] = 0;
 			if (align === "middle") {
 				css.top = '45%';
@@ -356,7 +357,9 @@
 	Notification.prototype.setElementPosition = function() {
 		var arrowColor, arrowCss, arrowSize, color, contH, contW, css, elemH, elemIH, elemIW, elemPos, elemW, gap, j, k, len, len1, mainFull, margin, opp, oppFull, pAlign, pArrow, pMain, pos, posFull, position, ref, wrapPos;
 		position = this.getPosition();
-		pMain = position[0], pAlign = position[1], pArrow = position[2];
+		pMain = position[0];
+		pAlign = position[1];
+		pArrow = position[2];
 		elemPos = this.elem.position();
 		elemH = this.elem.outerHeight();
 		elemW = this.elem.outerWidth();
