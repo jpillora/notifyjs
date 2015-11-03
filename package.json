@@ -24,5 +24,12 @@
   },
   "devDependencies": {
     "jshint": "^2.8.0"
-  }
+  },
+  "keywords": [
+    "notify",
+    "notification",
+    "prompt",
+    "popup",
+		"jquery-plugin"
+  ]
 }
