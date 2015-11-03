@@ -1,18 +1,25 @@
 {
-	"title": "Notify.js",
-	"name": "notify",
-	"version": "0.3.4",
-	"author": {
-		"name": "Jaime Pillora"
-	},
-	"contributors": [
-		{
-			"name": "Evan Carroll",
-			"url": "http://www.evancarroll.com",
-			"email": "me@evancarroll.com"
-		}
-	],
-	"homepage": "http://notifyjs.com/",
-	"license": "MIT",
-	"main": "dist/notify.js"
+  "title": "Notify.js",
+  "name": "notify",
+  "version": "0.4.0",
+  "author": {
+    "name": "Jaime Pillora"
+  },
+  "contributors": [
+    {
+      "name": "Evan Carroll",
+      "url": "http://www.evancarroll.com",
+      "email": "me@evancarroll.com"
+    }
+  ],
+  "homepage": "http://notifyjs.com/",
+  "license": "MIT",
+  "main": "dist/notify.js",
+  "scripts": {
+    "test": "npm run lint",
+    "lint": "jshint ./dist/*.js"
+  },
+  "dependencies": {
+    "jquery": "^2.1.4"
+  }
 }

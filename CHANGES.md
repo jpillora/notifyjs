@@ -1,7 +1,4 @@
-2015-10-20	v0.3.3
+2015-10-20	v0.4
 
-	@EvanCarroll - Updated to remove Grunt, and coffeescript stuff.
-
-2015-11-01 v0.3.4
-
+	@EvanCarroll - Updated to remove Grunt, and coffeescript stuff, changed to use UMD.
 	@jpillora - Remove deprecated grunt file, there is now a single `notify.js` file
