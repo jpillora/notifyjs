@@ -390,7 +390,7 @@
 		} else {
 			arrowSize = this.options.arrowSize;
 			arrowCss = $.extend({}, css);
-			arrowColor = this.userContainer.css("border-color") || this.userContainer.css("background-color") || "white";
+			arrowColor = this.userContainer.css("border-color") || this.userContainer.css("border-top-color") || this.userContainer.css("background-color") || "white";
 			for (k = 0, len1 = mainPositions.length; k < len1; k++) {
 				pos = mainPositions[k];
 				posFull = positions[pos];
