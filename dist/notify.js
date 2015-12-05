@@ -522,7 +522,8 @@
 	};
 
 	Notification.prototype.destroy = function() {
-		return this.wrapper.remove();
+		this.wrapper.data(pluginClassName, null);
+		this.wrapper.remove();
 	};
 
 	$[pluginName] = function(elem, data, options) {
@@ -538,13 +539,11 @@
 
 	$.fn[pluginName] = function(data, options) {
 		$(this).each(function() {
-			var inst;
-			inst = getAnchorElement($(this)).data(pluginClassName);
-			if (inst) {
-				return inst.run(data, options);
-			} else {
-				return new Notification($(this), data, options);
+			var prev = getAnchorElement($(this)).data(pluginClassName);
+			if (prev) {
+				prev.destroy();
 			}
+			var curr = new Notification($(this), data, options);
 		});
 		return this;
 	};
@@ -603,9 +602,9 @@
 	$(function() {
 		insertCSS(coreStyle.css).attr("id", "core-notify");
 		$(document).on("click", "." + pluginClassName + "-hidable", function(e) {
-			return $(this).trigger("notify-hide");
+			$(this).trigger("notify-hide");
 		});
-		return $(document).on("notify-hide", "." + pluginClassName + "-wrapper", function(e) {
+		$(document).on("notify-hide", "." + pluginClassName + "-wrapper", function(e) {
 			var elem = $(this).data(pluginClassName);
 			if(elem) {
 				elem.show(false);

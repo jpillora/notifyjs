@@ -1,7 +1,7 @@
 {
   "title": "Notify.js",
-  "name": "notify",
-  "version": "0.4.0",
+  "name": "notifyjs-browser",
+  "version": "0.4.1",
   "author": {
     "name": "Jaime Pillora"
   },
@@ -19,7 +19,7 @@
     "test": "npm run lint",
     "lint": "jshint ./dist/*.js"
   },
-  "dependencies": {
+  "peerDependencies": {
     "jquery": "^2.1.4"
   },
   "devDependencies": {
@@ -30,6 +30,6 @@
     "notification",
     "prompt",
     "popup",
-		"jquery-plugin"
+    "jquery-plugin"
   ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "notify",
-  "version": "0.3.4",
+  "version": "0.4.1",
   "title": "notify",
   "description": "A robust, customizable notification library",
   "bugs": "https://github.com/jpillora/notifyjs/issues",
