@@ -329,6 +329,19 @@
 		return elems[fn].apply(elems, args);
 	};
 
+	Notification.prototype.setGlobalNoticePosition = function(align) {
+		this.wrapper.css({visibility: 'hidden', display: 'block', float: 'left'});
+		this.container.css({visibility: 'hidden', display: 'block'});
+		if (align === 'center') {
+			var css = {};
+			css.clear = 'both';
+			css.marginLeft = 0 - this.wrapper.width() / 2 + 'px';
+			this.wrapper.css(css);
+		}
+		this.wrapper.css({visibility: ''});
+		this.container.css({visibility: '', display: 'none'});
+	};
+
 	Notification.prototype.setGlobalPosition = function() {
 		var p = this.getPosition();
 		var pMain = p[0];
@@ -344,14 +357,16 @@
 			if (align === "middle") {
 				css.top = '45%';
 			} else if (align === "center") {
-				css.left = '45%';
+				css.left = '50%';
 			} else {
 				css[align] = 0;
 			}
 			anchor.css(css).addClass(pluginClassName + "-corner");
 			$("body").append(anchor);
 		}
-		return anchor.prepend(this.wrapper);
+		var elem = anchor.prepend(this.wrapper);
+		this.setGlobalNoticePosition(align);
+		return elem;
 	};
 
 	Notification.prototype.setElementPosition = function() {
