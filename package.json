@@ -20,7 +20,7 @@
     "lint": "jshint ./dist/*.js"
   },
   "peerDependencies": {
-    "jquery": "^2.1.4"
+    "jquery": ">=1.11.0"
   },
   "devDependencies": {
     "jshint": "^2.8.0"
