@@ -91,6 +91,15 @@
 		return styles[name];
 	};
 
+	var removeStyle = function(name) {
+		if (!name) {
+			throw "Missing Style name";
+		}
+		if (styles[name]) {
+			delete styles[name];
+		}
+	};
+
 	var addStyle = function(name, def) {
 		if (!name) {
 			throw "Missing Style name";
@@ -551,6 +560,7 @@
 	$.extend($[pluginName], {
 		defaults: defaults,
 		addStyle: addStyle,
+		removeStyle: removeStyle,
 		pluginOptions: pluginOptions,
 		getStyle: getStyle,
 		insertCSS: insertCSS
