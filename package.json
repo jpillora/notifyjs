@@ -5,6 +5,10 @@
   "author": {
     "name": "Jaime Pillora"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/notifyjs/notifyjs.git"
+  },
   "contributors": [
     {
       "name": "Evan Carroll",
