@@ -1,7 +1,7 @@
 {
-  "title": "Notify.js",
-  "name": "notifyjs-browser",
-  "version": "0.4.2",
+  "title": "Notify.js - Fork that includes namespace",
+  "name": "@oizulain/notifyjs-browser",
+  "version": "0.4.3",
   "author": {
     "name": "Jaime Pillora"
   },
@@ -12,6 +12,10 @@
       "email": "me@evancarroll.com"
     }
   ],
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/oizulain/notifyjs"
+  },
   "homepage": "http://notifyjs.com/",
   "license": "MIT",
   "main": "dist/notify.js",
@@ -19,7 +23,7 @@
     "test": "npm run lint",
     "lint": "jshint ./dist/*.js"
   },
-  "peerDependencies": {
+  "dependencies": {
     "jquery": ">=1.11.0"
   },
   "devDependencies": {
