@@ -393,7 +393,7 @@
 			}
 		}
         arrowSize = (this.options.arrowShow ? this.options.arrowSize : 0);
-		gap = Math.max(0, this.options.gap - arrowSize);
+        gap = Math.max(0, this.options.gap - arrowSize);
 		incr(css, oppFull, gap);
 		if (!this.options.arrowShow) {
 			this.arrow.hide();
