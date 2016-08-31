@@ -1,4 +1,8 @@
-﻿//Created by Bahman Nikkhahan https://github.com/bahman616
+// Type definitions for notify.js
+// Project: https://github.com/notifyjs/notifyjs
+// Definitions by: Bahman Nikkhahan https://github.com/bahman616
+// This definition needs a reference from jquery.d.ts
+
 interface NotificationOptions {
     // whether to hide the notification on click
     clickToHide: boolean;
@@ -33,43 +37,43 @@ interface NotificationOptions {
 
 interface JQueryStaticNotify {
     /** 
-     * notify user
-     * @param element a jquery element
-     * @param notificationdata global notification data
-     * @param options notification options
-     */
+        * notify user
+        * @param element a jquery element
+        * @param notificationdata global notification data
+        * @param options notification options
+        */
     (element?: any, notificationdata?: any, options?: NotificationOptions): JQueryStatic;
 
     /**
-     * notify user
-     * @param styleName style name
-     * @param styleDefinition style definition object
-     */
-    addStyle(styleName: string, styleDefinition: any);
+        * Add style
+        * @param styleName style name
+        * @param styleDefinition style definition object
+        */
+    addStyle(styleName: string, styleDefinition: any): any;
 
     /**
-     * notify user
-     * @param styleName style name
-     */
-    removeStyle(styleName: string);
+        * Remove style
+        * @param styleName style name
+        */
+    removeStyle(styleName: string): any;
 
     /**
-     * notify user
-     * @param styleName style name
-     */
-    getStyle(styleName: string);
+        * Get style
+        * @param styleName style name
+        */
+    getStyle(styleName: string): any;
 
     /**
-     * notify user
-     * @param cssText css text to insert
-     */
-    insertCSS(cssText: string);
+        * Insert css
+        * @param cssText css text to insert
+        */
+    insertCSS(cssText: string): any;
 
     /**
-     * notify user
-     * @param options notification iptions
-     */
-    defaults(options: NotificationOptions)
+        * Set defaults for notifications
+        * @param options notification iptions
+        */
+    defaults(options: NotificationOptions): any;
 }
 
 interface JQueryStatic {
@@ -78,43 +82,43 @@ interface JQueryStatic {
 
 interface JQueryNotify {
     /**
-     * notify user
-     * @param element a jquery element
-     * @param notificationdata global notification data
-     * @param options notification options
-     */
-    (element?: any, notificationdata?: any, options?: NotificationOptions):  JQuery;
+        * notify user
+        * @param element a jquery element
+        * @param notificationdata global notification data
+        * @param options notification options
+        */
+    (element?: any, notificationdata?: any, options?: NotificationOptions): JQuery;
 
     /**
-     * notify user
-     * @param styleName style name
-     * @param styleDefinition style definition object
-     */
-    addStyle(styleName: string, styleDefinition: any);
+        * Add style
+        * @param styleName style name
+        * @param styleDefinition style definition object
+        */
+    addStyle(styleName: string, styleDefinition: any): any;
 
     /**
-     * notify user
-     * @param styleName style name
-     */
-    removeStyle(styleName: string);
+        * Remove style
+        * @param styleName style name
+        */
+    removeStyle(styleName: string): any;
 
     /**
-     * notify user
-     * @param styleName style name
-     */
-    getStyle(styleName: string);
+        * Get style
+        * @param styleName style name
+        */
+    getStyle(styleName: string): any;
 
     /**
-     * notify user
-     * @param cssText css text to insert
-     */
-    insertCSS(cssText: string);
+        * Insert css
+        * @param cssText css text to insert
+        */
+    insertCSS(cssText: string): any;
 
     /**
-     * notify user
-     * @param options notification iptions
-     */
-    defaults(options: NotificationOptions)
+        * Set defaults for notifications
+        * @param options notification iptions
+        */
+    defaults(options: NotificationOptions): any;
 
 }
 
