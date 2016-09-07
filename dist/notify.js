@@ -360,7 +360,11 @@
 			anchor.css(css).addClass(pluginClassName + "-corner");
 			$("body").append(anchor);
 		}
-		return anchor.prepend(this.wrapper);
+		if (this.options.order && this.options.order === "fifo") {
+		    return anchor.append(this.wrapper);
+		} else {
+		    return anchor.prepend(this.wrapper);
+		}
 	};
 
 	Notification.prototype.setElementPosition = function() {
