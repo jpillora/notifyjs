@@ -3,6 +3,8 @@ Notify.js
 
 > A simple, yet fully customizable notification library
 
+    npm install notifyjs-browser
+
 See demos and full documentation at:
 
 ## https://notifyjs.com/
