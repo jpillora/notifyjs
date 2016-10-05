@@ -346,7 +346,7 @@
 		var align = positions[pAlign];
 		var key = pMain + "|" + pAlign;
 		var anchor = globalAnchors[key];
-		if (!anchor || !document.contains(anchor[0])) {
+		if (!anchor || !$.contains(document.body,anchor[0])) {
 			anchor = globalAnchors[key] = createElem("div");
 			var css = {};
 			css[main] = 0;
