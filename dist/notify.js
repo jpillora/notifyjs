@@ -503,20 +503,29 @@
 			datas[blankFieldName] = data;
 		}
 		for (name in datas) {
-			d = datas[name];
-			type = this.userFields[name];
-			if (!type) {
-				continue;
-			}
-			if (type === "text") {
-				d = encode(d);
-				if (this.options.breakNewLines) {
-					d = d.replace(/\n/g, '<br/>');
-				}
-			}
-			value = name === blankFieldName ? '' : '=' + name;
-			find(this.userContainer, "[data-notify-" + type + value + "]").html(d);
-		}
+      d = datas[name];
+      type = this.userFields[name];
+      if (!type) {
+          continue;
+      }
+
+      value = name === blankFieldName ? '' : '=' + name;
+      var element = find(this.userContainer, "[data-notify-" + type + value + "]");
+      if (element.length === 1) {
+        if (element[0].tagName == "IMG") {
+          element.attr("src",d);
+        }
+        else {
+          if (type === "text") {
+            d = encode(d);
+            if (this.options.breakNewLines) {
+              d = d.replace(/\n/g, '<br/>');
+            }
+          }
+          element.html(d);
+        }
+      }
+    }
 		this.updateClasses();
 		if (this.elem) {
 			this.setElementPosition();
