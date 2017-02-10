@@ -293,8 +293,7 @@
 			this.originalElement = elem;
 			this.elem = getAnchorElement(elem);
 			this.elem.data(pluginClassName, this);
-			if (elem.is('body')) this.elem.append(this.wrapper);
-			else  this.elem.before(this.wrapper);
+			this.elem.before(this.wrapper);
 		}
 		this.container.hide();
 		this.run(data);
