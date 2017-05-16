@@ -351,7 +351,11 @@
 			var css = {};
 			css[main] = 0;
 			if (align === "middle") {
-				css.top = '45%';
+				if (screen.width < 768) {
+					css.top = '25%';
+				} else {
+					css.top = '45%';
+				}
 			} else if (align === "center") {
 				css.left = '45%';
 			} else {
