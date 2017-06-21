@@ -538,10 +538,11 @@
 	$[pluginName] = function(elem, data, options) {
 		if ((elem && elem.nodeName) || elem.jquery) {
 			$(elem)[pluginName](data, options);
+			return $(elem).data('notifyjs-curr');
 		} else {
 			options = data;
 			data = elem;
-			new Notification(null, data, options);
+			return new Notification(null, data, options);
 		}
 		return elem;
 	};
@@ -553,6 +554,7 @@
 				prev.destroy();
 			}
 			var curr = new Notification($(this), data, options);
+			$(this).data('notifyjs-curr', curr);
 		});
 		return this;
 	};
