@@ -201,7 +201,8 @@
 		showDuration: 400,
 		hideAnimation: "slideUp",
 		hideDuration: 200,
-		gap: 5
+		gap: 5, 
+		onclick: null
 	};
 
 	var inherit = function(a, b) {
@@ -527,6 +528,10 @@
 		if (this.options.autoHide) {
 			clearTimeout(this.autohideTimer);
 			this.autohideTimer = setTimeout(this.show.bind(this, false), this.options.autoHideDelay);
+		}
+
+		if (this.options.onclick){
+			$(this.userContainer).click(this.options.onclick)
 		}
 	};
 
