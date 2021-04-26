@@ -1,0 +1,53 @@
+.notifyjs-fa-theme-base {
+  position: relative;
+  min-height: 52px;
+  color:#444;
+  box-shadow: 0 2px 28px 0 rgba(58,59,69,0.15);
+  -webkit-box-shadow: 0 2px 28px 0 rgba(58,59,69,0.15);
+  -moz-box-shadow: 0 2px 28px 0 rgba(58,59,69,0.15);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+
+}
+
+.notifyjs-fa-theme-base .image {
+  display: table;
+  position: absolute;
+  height: auto;
+  width: auto;
+  left: 25px;
+  top: 50%;
+
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.notifyjs-fa-theme-base .image img{
+  width: 50px;
+  height: 50px;
+}
+
+.notifyjs-fa-theme-base .text-wrapper {
+  display: inline-block;
+  vertical-align: top;
+  text-align: left;
+  margin: 10px 10px 10px 52px;
+  clear: both;
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+}
+
+.notifyjs-fa-theme-base .title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.notifyjs-fa-theme-base .text {
+  font-size: 13px;
+  padding-right: 10px;
+  font-weight: normal;
+  vertical-align: middle;
+}

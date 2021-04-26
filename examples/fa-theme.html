@@ -1,0 +1,44 @@
+<html>
+<body>
+<head>
+	<link href="../dist/styles/fa-theme/notify-fa-theme.css" rel="stylesheet" />
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800,900" rel="stylesheet">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+	<script src="../dist/notify.js"></script>
+	<script src="../dist/styles/fa-theme/notify-fa-theme.js"></script>
+</head>
+
+<h2>Index</h2>
+<p>
+This page use <a href="https://fontawesome.com/" target="_blank">fontawesome.com</a> for notifications icon.<br/><br/>
+Use the icon class name in the second parameter to add a new notification with an icon :<br/>
+<pre>
+notify('success','far fa-check-circle');
+</pre>
+
+</p>
+<button onclick="notify('white','fas fa-info')">White</button>
+<button onclick="notify('black','fas fa-trash-alt')">Black</button>
+<button onclick="notify('error','fas fa-ban')">Err</button>
+<button onclick="notify('success','far fa-check-circle')">Success</button>
+<button onclick="notify('warning','fas fa-radiation')">Warning</button>
+<button onclick="notify('info','fas fa-map-marker-alt')">Info</button>
+
+<script type="text/javascript">
+    function notify($style, $faIcon) {
+        $.notify({
+            title: 'Notification',
+            text: 'This is an incredible notification !',
+            image: "<i class='"+ $faIcon +" fa-lg'></i>"
+        }, {
+            style: 'fa-theme',
+            className: $style,
+            autoHide: false,
+            clickToHide: true
+        });
+    }
+</script>
+</body>
+</html>
