@@ -402,7 +402,7 @@
 			arrowColor = this.userContainer.css("border-color") || this.userContainer.css("border-top-color") || this.userContainer.css("background-color") || "white";
 			for (k = 0, len1 = mainPositions.length; k < len1; k++) {
 				pos = mainPositions[k];
-				posFull = positions[pos];
+				posFull = positions[pos];	
 				if (pos === opp) {
 					continue;
 				}
@@ -420,7 +420,13 @@
 				incr(arrowCss, "left", realign(pAlign, arrowSize, elemIW));
 			}
 		} else if (indexOf.call(hAligns, pMain) >= 0) {
-			incr(css, "top", realign(pAlign, contH, elemH));
+			var __top = this.container.attr("top");
+            if (__top == 0) {
+                incr(css, 'top', realign(pAlign, contH, elemH));
+            } else {
+                incr(css, 'top', __top);
+            }
+
 			if (arrowCss) {
 				incr(arrowCss, "top", realign(pAlign, arrowSize, elemIH));
 			}
