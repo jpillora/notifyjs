@@ -201,7 +201,8 @@
 		showDuration: 400,
 		hideAnimation: "slideUp",
 		hideDuration: 200,
-		gap: 5
+		gap: 5,
+		encode: true,
 	};
 
 	var inherit = function(a, b) {
@@ -509,7 +510,9 @@
 				continue;
 			}
 			if (type === "text") {
-				d = encode(d);
+				if (this.options.encode) {
+					d = encode(d);
+				}
 				if (this.options.breakNewLines) {
 					d = d.replace(/\n/g, '<br/>');
 				}
