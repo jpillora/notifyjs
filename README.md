@@ -5,7 +5,7 @@ Notify.js
 
 See demos and full documentation at:
 
-## https://notifyjs.com/
+## https://notifyjs.jpillora.com/
 
 ----
 
