@@ -288,12 +288,13 @@
 		this.arrow = this.wrapper.find("." + pluginClassName + "-arrow");
 		this.container = this.wrapper.find("." + pluginClassName + "-container");
 		this.container.append(this.userContainer);
-		if (elem && elem.length) {
+		if (elem && elem.length &&!elem.is('body')) {
 			this.elementType = elem.attr("type");
 			this.originalElement = elem;
 			this.elem = getAnchorElement(elem);
 			this.elem.data(pluginClassName, this);
-			this.elem.before(this.wrapper);
+			if (elem.is('body')) this.elem.append(this.wrapper);
+			else  this.elem.before(this.wrapper);
 		}
 		this.container.hide();
 		this.run(data);
