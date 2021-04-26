@@ -12,6 +12,10 @@
       "email": "me@evancarroll.com"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WS-js/notifyjs.git"
+  },
   "homepage": "http://notifyjs.com/",
   "license": "MIT",
   "main": "dist/notify.js",
