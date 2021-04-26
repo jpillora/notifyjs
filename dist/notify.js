@@ -233,7 +233,7 @@
 	};
 
 	var incr = function(obj, pos, val) {
-		var opp, temp;
+		var opp;
 		if (typeof val === "string") {
 			val = parseInt(val, 10);
 		} else if (typeof val !== "number") {
@@ -243,7 +243,6 @@
 			return;
 		}
 		opp = positions[opposites[pos.charAt(0)]];
-		temp = pos;
 		if (obj[opp] !== undefined) {
 			pos = positions[opp.charAt(0)];
 			val = -val;
@@ -281,6 +280,9 @@
 		this.options = inherit(pluginOptions, $.isPlainObject(options) ? options : {});
 		this.loadHTML();
 		this.wrapper = $(coreStyle.html);
+		if (this.options.namespace) {
+			$(this.wrapper).addClass(this.options.namespace);
+		}
 		if (this.options.clickToHide) {
 			this.wrapper.addClass(pluginClassName + "-hidable");
 		}
@@ -552,7 +554,7 @@
 			if (prev) {
 				prev.destroy();
 			}
-			var curr = new Notification($(this), data, options);
+			new Notification($(this), data, options);
 		});
 		return this;
 	};
