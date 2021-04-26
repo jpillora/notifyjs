@@ -392,12 +392,12 @@
 				incr(css, pos, margin);
 			}
 		}
-		gap = Math.max(0, this.options.gap - (this.options.arrowShow ? arrowSize : 0));
+        arrowSize = (this.options.arrowShow ? this.options.arrowSize : 0);
+        gap = Math.max(0, this.options.gap - arrowSize);
 		incr(css, oppFull, gap);
 		if (!this.options.arrowShow) {
 			this.arrow.hide();
 		} else {
-			arrowSize = this.options.arrowSize;
 			arrowCss = $.extend({}, css);
 			arrowColor = this.userContainer.css("border-color") || this.userContainer.css("border-top-color") || this.userContainer.css("background-color") || "white";
 			for (k = 0, len1 = mainPositions.length; k < len1; k++) {
