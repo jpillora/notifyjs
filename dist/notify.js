@@ -536,7 +536,7 @@
 	};
 
 	$[pluginName] = function(elem, data, options) {
-		if ((elem && elem.nodeName) || elem.jquery) {
+		if ((elem && elem.nodeName) || (elem && elem.jquery)) {
 			$(elem)[pluginName](data, options);
 		} else {
 			options = data;
