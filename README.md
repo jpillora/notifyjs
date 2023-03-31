@@ -1,7 +1,7 @@
 Notify.js
 =====
 
-> A simple, yet fully customizable notification library
+> A simple, yet fully customizable notification library (Fork that includes namespace option)
 
 See demos and full documentation at:
 
