@@ -187,6 +187,7 @@
 	};
 
 	var pluginOptions = {
+		prepend: true,
 		clickToHide: true,
 		autoHide: true,
 		autoHideDelay: 5000,
@@ -360,7 +361,7 @@
 			anchor.css(css).addClass(pluginClassName + "-corner");
 			$("body").append(anchor);
 		}
-		return anchor.prepend(this.wrapper);
+		return anchor[this.options.prepend ? "prepend" : "append"](this.wrapper);
 	};
 
 	Notification.prototype.setElementPosition = function() {
